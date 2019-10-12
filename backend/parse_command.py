@@ -50,6 +50,10 @@ def text2int(textnum, numwords={}):
     return result + current
 
 
+def create_result_json(text, commands):
+    return {'rawText': text, 'commands': commands}
+
+
 def get_entities(text, client):
     document = types.Document(content=text, type=enums.Document.Type.PLAIN_TEXT)
 
@@ -88,8 +92,8 @@ def get_memory_base(memory_base):
     print('Base consist of ' + ', '.join(memory_base))
 
 
-def get_default_command(command_type, object_name, raw_text):
-    command = {'commandName': command_type, 'objectName': object_name, 'rawText': raw_text}
+def get_default_command(command_type, object_name):
+    command = {'commandName': command_type, 'objectName': object_name}
     return command
 
 
@@ -125,6 +129,9 @@ def get_command_for_remove(text, object_name):
 
 
 def text_to_command(text, client):
+    if text == '':
+        commands = []
+        return commands
     command_type = define_command_type(text)
     entities = get_entities(text, client)
     commands = []
@@ -192,4 +199,5 @@ def parse_command(text):
     client = language.LanguageServiceClient()
     text = text.lower()
     commands = text_to_command(text, client)
-    return commands
+    result_json = create_result_json(text, commands)
+    return result_json
