@@ -4,9 +4,9 @@ from google.cloud.language import enums
 from google.cloud.language import types
 
 word_to_command = {'rotate': 'rotate', 'turn': 'rotate', 'spin': 'rotate', 'twist': 'rotate',
+                   'on': 'teleportate', 'under': 'teleportate', 'teleportate': 'teleportate',
                    'create': 'create', 'add': 'create', 'draw': 'create', 'print': 'create', 'put': 'create',
                    'move': 'move', 'fly': 'move', 'go': 'move', 'jump': 'move', 'change': 'move',
-                   'teleportate': 'teleportate',
                    'remove': 'remove', 'delete': 'remove',
                    'bigger': 'make bigger', 'big': 'make bigger', 'larger': 'make bigger', 'large': 'make bigger',
                    'smaller': 'make smaller', 'small': 'make smaller', 'reduce': 'make smaller',
@@ -14,9 +14,10 @@ word_to_command = {'rotate': 'rotate', 'turn': 'rotate', 'spin': 'rotate', 'twis
                    'color': 'colour', 'colour': 'colour'}
 objects_belonging = {'everything': 'every'}
 
-correct_directions = ['left', 'right', 'up', 'down', 'back', 'top', 'front']
-directions_to_draw = {'left': 'left', 'right': 'right', 'up': 'up', 'down': 'down', 'back': 'back',
-                      'top': 'front', 'front': 'front'}
+correct_directions = ['left', 'right', 'up', 'down', 'back', 'top', 'front', 'on', 'under']
+directions_to_draw = {'left': 'left', 'right': 'right', 'up': 'up', 'on': 'up', 'down': 'down', 'under': 'down',
+                      'back': 'back', 'top': 'front', 'front': 'front'}
+
 correct_colours = ['green', 'red', 'white', 'yellow', 'blue', 'black', 'brown', 'pink']
 colour_to_rgb = {'green': (0.0, 1.0, 0.0), 'red': (1.0, 0.0, 0.0), 'white': (1.0, 1.0, 1.0),
                  'yellow': (1.0, 1.0, 0.0), 'blue': (0.0, 0.0, 1.0), 'black': (0.0, 0.0, 0.0),
@@ -106,7 +107,7 @@ def get_memory_base(memory_base):
 
 
 def clear_memory_base(memory_base):
-    memory_base = []
+    memory_base.clear()
 
 
 def get_default_command(command_type, object_name):
@@ -231,19 +232,24 @@ def text_to_command(text, client):
                     print('Repeat direction')
 
     if command_type == 'teleportate':
-        assert len(entities) == 3, 'Where to move'
         object_name = entities[0]
-        direction = entities[1]
-        subject_name = entities[2]
+        subject_name = entities[1]
         direction_is_correct = if_direction_is_correct(direction)
         object_in_memory_base = if_object_in_memory_base(memory_base, object_name)
         subject_in_memory_base = if_object_in_memory_base(memory_base, subject_name)
-        if object_in_memory_base and subject_in_memory_base:
-            if direction_is_correct:
-                current_command = get_command_for_teleportate(object_name, direction, subject_name)
-                commands.append(current_command)
-            else:
-                print('Repeat direction')
+        if not object_in_memory_base:
+            add_object_to_memory_base(memory_base, object_name)
+            current_command = get_command_for_create(object_name)
+            commands.append(current_command)
+        if not subject_in_memory_base:
+            add_object_to_memory_base(memory_base, subject_name)
+            current_command = get_command_for_create(subject_name)
+            commands.append(current_command)
+        if direction_is_correct:
+            current_command = get_command_for_teleportate(object_name, direction, subject_name)
+            commands.append(current_command)
+        else:
+            print('Repeat direction')
 
     if command_type == 'remove':
         objects_to_delete = []
