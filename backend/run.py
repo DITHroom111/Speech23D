@@ -1,8 +1,10 @@
-from flask import Flask, Response, request, render_template
+from flask import Flask, request, render_template
 from google.cloud.speech import enums, types, SpeechClient
-from parse_command import parse_command
-import pyaudio
+
+import json
 import os
+
+from parse_command import parse_command
 
 
 app = Flask(__name__)
@@ -26,7 +28,7 @@ def upload():
     print(response)
     for result in response.results:
         voice_command = result.alternatives[0].transcript
-        return parse_command(voice_command)
+        return json.dumps(parse_command(voice_command))
 
 
 @app.route('/')
