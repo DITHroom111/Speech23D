@@ -12,6 +12,8 @@ correct_directions = ['left', 'right', 'up', 'down', 'back', 'top', 'front']
 directions_to_draw = {'left': 'left', 'right': 'right', 'up': 'up', 'down': 'down', 'back': 'back',
                       'top': 'front', 'front': 'front'}
 
+memory_base = []
+
 
 def text2int(textnum, numwords={}):
     if not numwords:
@@ -62,9 +64,23 @@ def get_syntax(text, client):
 
 
 def if_direction_is_correct(direction):
-    if direction not in correct_directions:
-        return False
-    return True
+    if direction in correct_directions:
+        return True
+    return False
+
+
+def if_object_in_memory_base(memory_base, object_name):
+    if object_name in memory_base:
+        return True
+    return False
+
+
+def add_object_to_memory_base(memory_base, object_name):
+    memory_base.append(object_name)
+
+
+def get_memory_base(memory_base):
+    print('Base consist of ' + ', '.join(memory_base))
 
 
 def get_default_command(command_type, object_name, raw_text):
@@ -104,9 +120,13 @@ def text_to_command(text, client):
     commands = []
 
     if command_type == 'create':
-        for entity in entities:
-            current_command = get_command_for_create(text, entity)
-            commands.append(current_command)
+        assert len(entities) > 0, 'There is no anything to create'
+        for object_name in entities:
+            object_in_memory_base = if_object_in_memory_base(memory_base, object_name)
+            if not object_in_memory_base:
+                add_object_to_memory_base(memory_base, object_name)
+                current_command = get_command_for_create(text, object_name)
+                commands.append(current_command)
 
     if command_type == 'rotate':
         assert len(entities) == 2, 'How much to turn'
@@ -148,10 +168,9 @@ def define_command_type(text):
             return word_to_command[word]
     return default_command_type
 
+
 def parse_command(text):
     client = language.LanguageServiceClient()
     text = text.lower()
     commands = text_to_command(text, client)
     return commands
-
-
