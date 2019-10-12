@@ -153,7 +153,7 @@ function startRecording() {
 			the sampleRate defaults to the one set in your OS for your playback device
 
 		*/
-		audioContext = new AudioContext();
+		var audioContext = new AudioContext();
 
 		//update the format
 		//document.getElementById("formats").innerHTML="Format: 1 channel pcm @ "+audioContext.sampleRate/1000+"kHz"
@@ -162,7 +162,7 @@ function startRecording() {
 		gumStream = stream;
 
 		/* use the stream */
-		input = audioContext.createMediaStreamSource(stream);
+		var input = audioContext.createMediaStreamSource(stream);
 
 		/*
 			Create the Recorder object and configure to record mono sound (1 channel)
@@ -226,7 +226,7 @@ function uploadWavWithScene(blob, container) {
         }
     };
     var fd = new FormData();
-    fd.append("audio_data", blob, WAV_FILENAME);
+    fd.append("audio_data", blob, "speech.wav");
     xhr.open("POST", "upload", true);
     xhr.send(fd);
 }
