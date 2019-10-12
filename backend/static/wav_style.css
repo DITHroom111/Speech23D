@@ -2,10 +2,14 @@
   display: flex;
   margin-top: 2rem;
   max-width: 28rem;
-  min-width: 2rem;
+  min-width: 28rem;
+  position: absolute;
+  top: 5%;
+  overflow: hidden;
 }
 button {
   flex-grow: 1;
+  position: relative;
   height: 2.5rem;
   border: none;
   border-radius: 0.15rem;
