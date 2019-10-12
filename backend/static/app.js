@@ -34,6 +34,29 @@ function processCommand(json, container, objects) {
             break;
         case 'move':
             console.log('move');
+            if (typeof json["type"] === 'undefined') {
+                throw new Error("No move type found!");
+            }
+            switch (json["type"]) {
+                case 'up':
+                    up(json["objectName"], container, objects);
+                    break;
+                case 'down':
+                    down(json["objectName"], container, objects);
+                    break;
+                case 'left':
+                    left(json["objectName"], container, objects);
+                    break;
+                case 'right':
+                    right(json["objectName"], container, objects);
+                    break;
+                case 'front':
+                    front(json["objectName"], container, objects);
+                    break;
+                case 'back':
+                    back(json["objectName"], container, objects);
+                    break;
+            }
             break;
         case 'teleportate':
             console.log('teleportate');
@@ -49,6 +72,33 @@ function processCommand(json, container, objects) {
             break;
     }
 }
+
+const MOVE_STEP = 100;
+
+function up(objectName, container, objects) {
+    objects.get(objectName).translateZ(MOVE_STEP);
+}
+
+function down(objectName, container, objects) {
+    objects.get(objectName).translateZ(-MOVE_STEP);
+}
+
+function left(objectName, container, objects) {
+    objects.get(objectName).translateX(MOVE_STEP);
+}
+
+function right(objectName, container, objects) {
+    objects.get(objectName).translateX(-MOVE_STEP);
+}
+
+function front(objectName, container, objects) {
+    objects.get(objectName).translateY(MOVE_STEP);
+}
+
+function back(objectName, container, objects) {
+    objects.get(objectName).translateY(-MOVE_STEP);
+}
+
 
 function clear(container, objects) {
     while (container.children.length) {
@@ -152,7 +202,7 @@ function startRecording() {
 		https://addpipe.com/blog/audio-constraints-getusermedia/
 	*/
 
-    var constraints = { audio: true, video:false }
+    var constraints = {audio: true, video: false}
 
  	/*
     	Disable the record button until we get a success or fail from getUserMedia()
