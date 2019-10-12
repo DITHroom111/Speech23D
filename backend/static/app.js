@@ -73,7 +73,7 @@ function getBestAsset(data, text) {
 
 
 function processFirstAsset(objectName, processAsset) {
-    var url = `https://poly.googleapis.com/v1/assets?keywords=${objectName}&format=OBJ&key=${API_KEY}`;
+    var url = `https://poly.googleapis.com/v1/assets?keywords=${objectName}&format=OBJ&pageSize=100&key=${API_KEY}`;
 
     var request = new XMLHttpRequest();
     request.open( 'GET', url, true );
