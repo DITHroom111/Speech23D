@@ -1,35 +1,12 @@
-* {
-  padding: 0;
-  margin: 0;
-}
-a {
-  color: #337ab7;
-}
-p {
-  margin-top: 1rem;
-}
-a:hover {
-  color:#23527c;
-}
-a:visited {
-  color: #8d75a3;
-}
-body {
-  margin: 1rem;
-  padding: 1rem;
-  font-family: sans-serif;
-  max-width: 28rem;
-  margin: 0 auto;
-  position: relative;
-}
 #controls {
   display: flex;
   margin-top: 2rem;
+  max-width: 28rem;
+  min-width: 2rem;
 }
 button {
   flex-grow: 1;
   height: 2.5rem;
-  min-width: 2rem;
   border: none;
   border-radius: 0.15rem;
   background: #ed341d;
@@ -60,17 +37,4 @@ button:disabled {
 }
 button:first-child {
   margin-left: 0;
-}
-audio {
-  display: block;
-  width: 100%;
-  margin-top: 0.2rem;
-}
-li {
-  list-style: none;
-  margin-bottom: 1rem;
-}
-#formats {
-  margin-top: 0.5rem;
-  font-size: 80%;
 }
