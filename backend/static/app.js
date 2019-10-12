@@ -1,0 +1,209 @@
+'use strict';
+
+//webkitURL is deprecated but nevertheless
+
+const API_KEY = 'AIzaSyC3mTnJ6tywpTUAyBziSRnME63O5nSLOLg';
+
+
+function processCommand(json, scene) {
+    console.log(Object.keys(json));
+    if (typeof json["commandName"] === 'undefined') {
+        throw new Error("No command name found!");
+    }
+    if (typeof json["objectName"] === 'undefined') {
+        throw new Error("No object name found!");
+    }
+
+    switch(json["commandName"]) {
+        case 'create':
+            alert('create');
+            create(json["objectName"], scene);
+            break;
+        case 'rotate':
+            alert('rotate');
+            break;
+        case 'move':
+            alert('move');
+            break;
+        case 'teleportate':
+            alert('teleportate');
+            break;
+        case 'makeBigger':
+            alert('makeBigger');
+            break;
+        case 'makeSmaller':
+            alert('makeSmaller');
+            break;
+        default:
+            alert("Unknown command");
+            break;
+    }
+}
+
+function create(objectName, scene) {
+    function drawAsset(asset) {
+        drawAssetOnScene(asset, scene);
+    }
+    processFirstAsset(objectName, drawAsset);
+}
+
+
+function getFirstAsset(data) {
+    var assets = data.assets;
+    if (assets) {
+        return assets[0];
+    } else {
+        alert("No assets found");
+    }
+}
+
+
+function processFirstAsset(keywords, processAsset) {
+    var url = `https://poly.googleapis.com/v1/assets?keywords=${keywords}&format=OBJ&key=${API_KEY}`;
+
+    var request = new XMLHttpRequest();
+    request.open( 'GET', url, true );
+    request.addEventListener('load', function(event) {
+        processAsset(getFirstAsset(JSON.parse(event.target.response)));
+    });
+    request.send(null);
+}
+
+
+function drawAssetOnScene(asset, scene) {
+    var format = asset.formats.find( format => { return format.formatType === 'OBJ'; } );
+
+    if ( format !== undefined ) {
+        var obj = format.root;
+        var mtl = format.resources.find( resource => { return resource.url.endsWith( 'mtl' ) } );
+
+        var path = obj.url.slice( 0, obj.url.indexOf( obj.relativePath ) );
+
+        var loader = new THREE.MTLLoader();
+        loader.setCrossOrigin( true );
+        loader.setMaterialOptions( { ignoreZeroRGBs: true } );
+        loader.setTexturePath( path );
+        loader.load( mtl.url, function ( materials ) {
+            var loader = new THREE.OBJLoader();
+            loader.setMaterials( materials );
+            loader.load( obj.url, function ( object ) {
+                var box = new THREE.Box3();
+                box.setFromObject( object );
+
+                // re-center
+                var center = box.getCenter();
+                center.y = box.min.y;
+                object.position.sub( center );
+
+                // scale
+                var scaler = new THREE.Group();
+                scaler.add( object );
+                scaler.scale.setScalar( 6 / box.getSize().length() );
+                scene.add( scaler );
+            });
+        });
+    }
+}
+
+function startRecording() {
+	console.log("recordButton clicked");
+
+	/*
+		Simple constraints object, for more advanced audio features see
+		https://addpipe.com/blog/audio-constraints-getusermedia/
+	*/
+
+    var constraints = { audio: true, video:false }
+
+ 	/*
+    	Disable the record button until we get a success or fail from getUserMedia()
+	*/
+
+	recordButton.disabled = true;
+	stopButton.disabled = false;
+
+	/*
+    	We're using the standard promise based getUserMedia()
+    	https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
+	*/
+
+	navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
+		console.log("getUserMedia() success, stream created, initializing Recorder.js ...");
+
+		/*
+			create an audio context after getUserMedia is called
+			sampleRate might change after getUserMedia is called, like it does on macOS when recording through AirPods
+			the sampleRate defaults to the one set in your OS for your playback device
+
+		*/
+		audioContext = new AudioContext();
+
+		//update the format
+		//document.getElementById("formats").innerHTML="Format: 1 channel pcm @ "+audioContext.sampleRate/1000+"kHz"
+
+		/*  assign to gumStream for later use  */
+		gumStream = stream;
+
+		/* use the stream */
+		input = audioContext.createMediaStreamSource(stream);
+
+		/*
+			Create the Recorder object and configure to record mono sound (1 channel)
+			Recording 2 channels  will double the file size
+		*/
+		rec = new Recorder(input,{numChannels:1})
+
+		//start the recording process
+		rec.record()
+
+		console.log("Recording started");
+
+	}).catch(function(err) {
+	  	//enable the record button if getUserMedia() fails
+    	recordButton.disabled = false;
+    	stopButton.disabled = true;
+	});
+}
+
+
+function stopRecordingWithScene(scene) {
+	console.log("stopButton clicked");
+
+	//disable the stop button, enable the record too allow for new recordings
+	stopButton.disabled = true;
+	recordButton.disabled = false;
+
+	//tell the recorder to stop the recording
+	rec.stop();
+
+	//stop microphone access
+	gumStream.getAudioTracks()[0].stop();
+
+	//create the wav blob and pass it on to createDownloadLink
+
+    function uploadWav(blob) {
+        uploadWavWithScene(blob, scene);
+    }
+	rec.exportWAV(uploadWav);
+}
+
+function uploadWavWithScene(blob, scene) {
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function(e) {
+        if (this.readyState === 4) {
+            console.log("Server returned: ", e.target.responseText);
+        }
+        alert(xhr.responseText);
+        var commands = JSON.parse(xhr.responseText);
+        console.log(commands);
+        console.log(commands.length);
+        for (var i = 0; i < commands.length; ++i) {
+            console.log(i);
+            processCommand(commands[i], scene);
+        }
+    };
+    var fd = new FormData();
+    fd.append("audio_data", blob, WAV_FILENAME);
+    xhr.open("POST", "upload", true);
+    xhr.send(fd);
+}

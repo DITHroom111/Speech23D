@@ -18,7 +18,6 @@
 
         <!-- inserting these scripts at the end to be able to use all the elements in the DOM -->
         <script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
-        <script src="static/app.js"></script>
 
 		<div id="viewer"></div>
 
@@ -30,33 +29,9 @@
 		<script src="static/third_party/three.js/js/three.min.js"></script>
 		<script src="static/third_party/three.js/js/OBJLoader.js"></script>
 		<script src="static/third_party/three.js/js/MTLLoader.js"></script>
-        <script type="text/javascript" src="static/draw_asset.js"></script> 
+        <script type="text/javascript" src="static/app.js"></script>
         <script>
-            URL = window.URL || window.webkitURL;
-
-            const WAV_FILENAME = "speach.wav";
-
-            var gumStream; 						//stream from getUserMedia()
-            var rec; 							//Recorder.js object
-            var input; 							//MediaStreamAudioSourceNode we'll be recording
-
-            // shim for AudioContext when it's not avb.
-            var AudioContext = window.AudioContext || window.webkitAudioContext;
-            var audioContext //audio context to help us record
-
-            var recordButton = document.getElementById("recordButton");
-            var stopButton = document.getElementById("stopButton");
-
-            function stopRecording() {
-                stopRecordingWithScene(scene);
-            }
-            function startRecording() {
-                startRecordingWithScene(scene);
-            }
-
-            //add events to those 2 buttons
-            recordButton.addEventListener("click", startRecording);
-            stopButton.addEventListener("click", stopRecording);
+            'use strict';
 
 			// THREE.JS VIEWER
 
@@ -100,13 +75,30 @@
 
             requestAnimationFrame( animate );
 
-            // POLY REST API
+            URL = window.URL || window.webkitURL;
 
-            function drawAsset(asset) {
-                drawAssetOnScene(asset, scene);
+            const WAV_FILENAME = "speach.wav";
+
+            var gumStream; 						//stream from getUserMedia()
+            var rec; 							//Recorder.js object
+            var input; 							//MediaStreamAudioSourceNode we'll be recording
+
+            var recordButton = document.getElementById("recordButton");
+            var stopButton = document.getElementById("stopButton");
+
+            //add events to those 2 buttons
+            recordButton.addEventListener("click", startRecording);
+            stopButton.addEventListener("click", stopRecording);
+
+            // shim for AudioContext when it's not avb.
+            var AudioContext = window.AudioContext || window.webkitAudioContext;
+            var audioContext //audio context to help us record
+
+            function stopRecording() {
+                stopRecordingWithScene(scene);
             }
 
-            processFirstAsset(["dragon"], drawAsset);
+            // POLY REST API
         </script>
 	</body>
 </html>
