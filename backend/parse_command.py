@@ -155,10 +155,19 @@ def get_command_for_clear():
     return command
 
 
+def remove_directions_from_text(text, direction):
+    new_text = text.split()
+    new_text.remove(direction)
+    return ' '.join(new_text)
+
+
 def text_to_command(text, client):
     if text == '':
         commands = []
         return commands
+    direction = define_directions(text)
+    if direction:
+        text = remove_directions_from_text(text, direction)
     command_type = define_command_type(text)
     object_belonging = define_command_belonging(text)
     entities = get_entities(text, client)
@@ -189,17 +198,21 @@ def text_to_command(text, client):
                 commands.append(current_command)
 
     if command_type == 'move':
-        assert len(entities) == 2, 'Where to move'
-        object_name = entities[0]
-        direction = entities[1]
+        objects_to_move = []
+        if object_belonging == 'one':
+            object_name = entities[0]
+            objects_to_move.append(object_name)
+        if object_belonging == 'every':
+            objects_to_move = get_memory_base(memory_base)
         direction_is_correct = if_direction_is_correct(direction)
-        object_in_memory_base = if_object_in_memory_base(memory_base, object_name)
-        if object_in_memory_base:
-            if direction_is_correct:
-                current_command = get_command_for_move(object_name, direction)
-                commands.append(current_command)
-            else:
-                print('Repeat direction')
+        for object_name in objects_to_move:
+            object_in_memory_base = if_object_in_memory_base(memory_base, object_name)
+            if object_in_memory_base:
+                if direction_is_correct:
+                    current_command = get_command_for_move(object_name, direction)
+                    commands.append(current_command)
+                else:
+                    print('Repeat direction')
 
     if command_type == 'teleportate':
         assert len(entities) == 3, 'Where to move'
@@ -270,6 +283,14 @@ def define_command_belonging(text):
             object_belonging = objects_belonging[word]
             return object_belonging
     return default_object_belonging
+
+
+def define_directions(text):
+    splitted_text = text.split()
+    for direction in correct_directions:
+        if direction in splitted_text:
+            return direction
+    return None
 
 
 def parse_command(text):
