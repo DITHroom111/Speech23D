@@ -47,24 +47,38 @@ function create(objectName, scene) {
     processFirstAsset(objectName, drawAsset);
 }
 
+function findAssetWithExactTitle(text, assets) {
+    for (int i = 0; i < asserts.length; ++i) {
+        if (assets[i].displayName == text) {
+            return i;
+        }
+    }
+    return -1;
+}
 
-function getFirstAsset(data) {
+
+function getBestAsset(data, text) {
     var assets = data.assets;
     if (assets) {
-        return assets[0];
+        var bestAssetIndex = findAssetWithExactTitle(text, assets);
+        if (bestAssetIndex != -1) {
+            return assets[bestAssetIndex];
+        } else {
+            return assets[0];
+        }
     } else {
         alert("No assets found");
     }
 }
 
 
-function processFirstAsset(keywords, processAsset) {
+function processFirstAsset(objectName, processAsset) {
     var url = `https://poly.googleapis.com/v1/assets?keywords=${keywords}&format=OBJ&key=${API_KEY}`;
 
     var request = new XMLHttpRequest();
     request.open( 'GET', url, true );
     request.addEventListener('load', function(event) {
-        processAsset(getFirstAsset(JSON.parse(event.target.response)));
+        processAsset(getBestAsset(JSON.parse(event.target.response), objectName));
     });
     request.send(null);
 }
