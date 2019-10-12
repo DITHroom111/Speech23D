@@ -7,10 +7,11 @@ word_to_command = {'rotate': 'rotate', 'turn': 'rotate', 'spin': 'rotate', 'twis
                    'create': 'create', 'add': 'create', 'draw': 'create', 'print': 'create', 'put': 'create',
                    'move': 'move', 'fly': 'move', 'go': 'move', 'jump': 'move', 'change': 'move',
                    'teleportate': 'teleportate',
-                   'remove': 'remove',
+                   'remove': 'remove', 'delete': 'delete',
                    'bigger': 'make bigger', 'big': 'make bigger', 'larger': 'make bigger', 'large': 'make bigger',
                    'smaller': 'make smaller', 'small': 'make smaller', 'reduce': 'make smaller',
-                   'clear': 'clear', 'everything': 'clear'}
+                   'clear': 'clear'}
+objects_belonging = {'everything': 'every'}
 
 correct_directions = ['left', 'right', 'up', 'down', 'back', 'top', 'front']
 directions_to_draw = {'left': 'left', 'right': 'right', 'up': 'up', 'down': 'down', 'back': 'back',
@@ -91,8 +92,12 @@ def remove_object_from_memory_base(memory_base, object_name):
     memory_base.remove(object_name)
 
 
-def get_memory_base(memory_base):
+def print_memory_base(memory_base):
     print('Base consist of ' + ', '.join(memory_base))
+
+
+def get_memory_base(memory_base):
+    return memory_base.copy()
 
 
 def clear_memory_base(memory_base):
@@ -155,6 +160,7 @@ def text_to_command(text, client):
         commands = []
         return commands
     command_type = define_command_type(text)
+    object_belonging = define_command_belonging(text)
     entities = get_entities(text, client)
     commands = []
 
@@ -168,13 +174,19 @@ def text_to_command(text, client):
                 commands.append(current_command)
 
     if command_type == 'rotate':
-        assert len(entities) == 2, 'How much to turn'
-        object_name = entities[0]
-        object_in_memory_base = if_object_in_memory_base(memory_base, object_name)
-        if object_in_memory_base:
-            angle = float(text2int(entities[1]))
-            current_command = get_command_for_rotate(object_name, angle)
-            commands.append(current_command)
+        objects_to_rotate = []
+        if object_belonging == 'one':
+            object_name = entities[0]
+            objects_to_rotate.append(object_name)
+            assert len(entities) == 2, 'How much to turn'
+        if object_belonging == 'every':
+            objects_to_rotate = get_memory_base(memory_base)
+        for object_name in objects_to_rotate:
+            object_in_memory_base = if_object_in_memory_base(memory_base, object_name)
+            if object_in_memory_base:
+                angle = float(text2int(entities[1]))
+                current_command = get_command_for_rotate(object_name, angle)
+                commands.append(current_command)
 
     if command_type == 'move':
         assert len(entities) == 2, 'Where to move'
@@ -241,8 +253,18 @@ def define_command_type(text):
     default_command_type = 'create'
     for word in word_to_command.keys():
         if word in text.split():
-            return word_to_command[word]
+            command_type = word_to_command[word]
+            return command_type
     return default_command_type
+
+
+def define_command_belonging(text):
+    default_object_belonging = 'one'
+    for word in objects_belonging.keys():
+        if word in text.split():
+            object_belonging = objects_belonging[word]
+            return object_belonging
+    return default_object_belonging
 
 
 def parse_command(text):
