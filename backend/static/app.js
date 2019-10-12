@@ -147,7 +147,7 @@ function startRecording() {
 
 	recordButton.disabled = true;
 	stopButton.disabled = false;
-    rawTextField.value = "tell me a command!";
+    rawTextField.innerHTML = "tell me a command!";
 
 	/*
     	We're using the standard promise based getUserMedia()
@@ -222,10 +222,10 @@ function uploadWavWithScene(blob, container, objects) {
         }
         console.log(xhr.responseText);
         if (xhr.responseText.endsWith("failed")) {
-            rawTextField.value = xhr.responseText;
+            rawTextField.innerHTML = xhr.responseText;
         } else {
             var parsed = JSON.parse(xhr.responseText);
-            rawTextField.value = parsed["rawText"];
+            rawTextField.innerHTML = parsed["rawText"];
             var commands = parsed["commands"];
             console.log(commands);
             for (var i = 0; i < commands.length; ++i) {

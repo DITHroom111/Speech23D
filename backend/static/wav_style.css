@@ -42,10 +42,11 @@ button:first-child {
   margin-left: 0;
 }
 #rawTextField {
-    width:100px;
+    width:600px;
     height:100px;
     background-color:#222222;
     color:#888888;
     position: absolute;
     top: 10%; left: 1rem;
+    font-size: 1.2rem;
 }
