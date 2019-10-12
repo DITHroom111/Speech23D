@@ -78,15 +78,16 @@ function processCommand(json, container, objects) {
 const SCALE_MULT = 1.5;
 
 function makeBigger(objectName, container, objects) {
-    Matrix4 biggerMatrix = TREE.Matrix4.makeScale(SCALE_MULT, SCALE_MULT, SCALE_NULT);
+    var biggerMatrix = new THREE.Matrix4();
+    biggerMatrix.makeScale(1.0 / SCALE_MULT, 1.0 / SCALE_MULT, 1.0 / SCALE_MULT);
     objects.get(objectName).applyMatrix(biggerMatrix);
 }
 
 function makeSmaller(objectName, container, objects) {
-    Matrix4 smallerMatrix = TREE.Matrix4.makeScale(1.0 / SCALE_MULT, 1.0 / SCALE_MULT, 1.0 / SCALE_NULT);
+    var smallerMatrix = new THREE.Matrix4();
+    smallerMatrix.makeScale(SCALE_MULT, SCALE_MULT, SCALE_MULT);
     objects.get(objectName).applyMatrix(smallerMatrix);
 }
-
 
 const MOVE_STEP = 1;
 
