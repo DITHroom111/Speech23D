@@ -208,7 +208,9 @@ function uploadWavWithScene(blob, scene) {
             console.log("Server returned: ", e.target.responseText);
         }
         console.log(xhr.responseText);
-        var commands = JSON.parse(xhr.responseText);
+        var parsed = JSON.parse(xhr.responseText);
+        var rawText = parsed["rawText"];
+        var commands = parsed["commands"];
         console.log(commands);
         console.log(commands.length);
         for (var i = 0; i < commands.length; ++i) {
