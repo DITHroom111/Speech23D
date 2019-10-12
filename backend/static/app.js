@@ -5,7 +5,7 @@
 const API_KEY = 'AIzaSyC3mTnJ6tywpTUAyBziSRnME63O5nSLOLg';
 
 
-function processCommand(json, container) {
+function processCommand(json, container, objects) {
     console.log(Object.keys(json));
     if (typeof json["commandName"] === 'undefined') {
         throw new Error("No command name found!");
@@ -17,7 +17,11 @@ function processCommand(json, container) {
     switch(json["commandName"]) {
         case 'create':
             console.log('create');
-            create(json["objectName"], container);
+            create(json["objectName"], container, objects);
+            break;
+        case 'remove':
+            console.log('remove');
+            remove(json["objectName"], container, objects);
             break;
         case 'rotate':
             console.log('rotate');
@@ -40,9 +44,14 @@ function processCommand(json, container) {
     }
 }
 
-function create(objectName, container) {
+function remove(objectName, container, objects) {
+    container.remove(objects.get(objectName));
+    objects.delete(objectName);
+}
+
+function create(objectName, container, objects) {
     function drawAsset(asset) {
-        drawAssetOnScene(asset, container);
+        drawAssetOnScene(asset, container, objects, objectName);
     }
     processFirstAsset(objectName, drawAsset);
 }
@@ -86,7 +95,7 @@ function processFirstAsset(objectName, processAsset) {
 }
 
 
-function drawAssetOnScene(asset, container) {
+function drawAssetOnScene(asset, container, objects, objectName) {
     var format = asset.formats.find(format => {return format.formatType === 'OBJ';});
 
     if ( format !== undefined ) {
@@ -116,6 +125,7 @@ function drawAssetOnScene(asset, container) {
                 scaler.add(object);
                 scaler.scale.setScalar(6 / box.getSize().length());
                 container.add(scaler);
+                objects.set(objectName, scaler);
             });
         });
     }
@@ -183,7 +193,7 @@ function startRecording() {
 }
 
 
-function stopRecordingWithScene(container) {
+function stopRecordingWithScene(container, objects) {
 	console.log("stopButton clicked");
 
 	//disable the stop button, enable the record too allow for new recordings
@@ -199,12 +209,12 @@ function stopRecordingWithScene(container) {
 	//create the wav blob and pass it on to createDownloadLink
 
     function uploadWav(blob) {
-        uploadWavWithScene(blob, container);
+        uploadWavWithScene(blob, container, objects);
     }
 	rec.exportWAV(uploadWav);
 }
 
-function uploadWavWithScene(blob, container) {
+function uploadWavWithScene(blob, container, objects) {
     var xhr = new XMLHttpRequest();
     xhr.onload = function(e) {
         if (this.readyState === 4) {
@@ -218,10 +228,9 @@ function uploadWavWithScene(blob, container) {
             rawTextField.value = parsed["rawText"];
             var commands = parsed["commands"];
             console.log(commands);
-            console.log(commands.length);
             for (var i = 0; i < commands.length; ++i) {
                 console.log(i);
-                processCommand(commands[i], container);
+                processCommand(commands[i], container, objects);
             }
         }
     };
