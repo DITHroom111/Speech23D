@@ -9,7 +9,8 @@ word_to_command = {'rotate': 'rotate', 'turn': 'rotate', 'spin': 'rotate', 'twis
                    'teleportate': 'teleportate',
                    'remove': 'remove',
                    'bigger': 'make bigger', 'big': 'make bigger', 'larger': 'make bigger', 'large': 'make bigger',
-                   'smaller': 'make smaller', 'small': 'make smaller', 'reduce': 'make smaller'}
+                   'smaller': 'make smaller', 'small': 'make smaller', 'reduce': 'make smaller',
+                   'clear': 'clear', 'everything': 'clear'}
 
 correct_directions = ['left', 'right', 'up', 'down', 'back', 'top', 'front']
 directions_to_draw = {'left': 'left', 'right': 'right', 'up': 'up', 'down': 'down', 'back': 'back',
@@ -94,6 +95,10 @@ def get_memory_base(memory_base):
     print('Base consist of ' + ', '.join(memory_base))
 
 
+def clear_memory_base(memory_base):
+    memory_base = []
+
+
 def get_default_command(command_type, object_name):
     command = {'commandName': command_type, 'objectName': object_name}
     return command
@@ -137,6 +142,11 @@ def get_command_for_make_bigger(object_name):
 
 def get_command_for_make_smaller(object_name):
     command = get_default_command('makeSmaller', object_name)
+    return command
+
+
+def get_command_for_clear():
+    command = get_default_command('clear', '')
     return command
 
 
@@ -218,6 +228,11 @@ def text_to_command(text, client):
             if object_in_memory_base:
                 current_command = get_command_for_make_smaller(object_name)
                 commands.append(current_command)
+
+    if command_type == 'clear':
+        clear_memory_base(memory_base)
+        current_command = get_command_for_clear()
+        commands.append(current_command)
 
     return commands
 
