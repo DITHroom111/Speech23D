@@ -16,26 +16,26 @@ function processCommand(json, scene) {
 
     switch(json["commandName"]) {
         case 'create':
-            alert('create');
+            console.log('create');
             create(json["objectName"], scene);
             break;
         case 'rotate':
-            alert('rotate');
+            console.log('rotate');
             break;
         case 'move':
-            alert('move');
+            console.log('move');
             break;
         case 'teleportate':
-            alert('teleportate');
+            console.log('teleportate');
             break;
         case 'makeBigger':
-            alert('makeBigger');
+            console.log('makeBigger');
             break;
         case 'makeSmaller':
-            alert('makeSmaller');
+            console.log('makeSmaller');
             break;
         default:
-            alert("Unknown command");
+            console.log("Unknown command");
             break;
     }
 }
@@ -48,7 +48,7 @@ function create(objectName, scene) {
 }
 
 function findAssetWithExactTitle(text, assets) {
-    for (int i = 0; i < asserts.length; ++i) {
+    for (var i = 0; i < assets.length; ++i) {
         if (assets[i].displayName == text) {
             return i;
         }
@@ -67,13 +67,13 @@ function getBestAsset(data, text) {
             return assets[0];
         }
     } else {
-        alert("No assets found");
+        console.log("No assets found");
     }
 }
 
 
 function processFirstAsset(objectName, processAsset) {
-    var url = `https://poly.googleapis.com/v1/assets?keywords=${keywords}&format=OBJ&key=${API_KEY}`;
+    var url = `https://poly.googleapis.com/v1/assets?keywords=${objectName}&format=OBJ&key=${API_KEY}`;
 
     var request = new XMLHttpRequest();
     request.open( 'GET', url, true );
@@ -207,7 +207,7 @@ function uploadWavWithScene(blob, scene) {
         if (this.readyState === 4) {
             console.log("Server returned: ", e.target.responseText);
         }
-        alert(xhr.responseText);
+        console.log(xhr.responseText);
         var commands = JSON.parse(xhr.responseText);
         console.log(commands);
         console.log(commands.length);
