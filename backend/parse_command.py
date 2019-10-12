@@ -6,7 +6,8 @@ from google.cloud.language import types
 word_to_command = {'rotate': 'rotate', 'turn': 'rotate', 'spin': 'rotate', 'twist': 'rotate',
                    'create': 'create', 'add': 'create', 'draw': 'create', 'print': 'create', 'put': 'create',
                    'move': 'move', 'fly': 'move',  'go': 'move', 'jump': 'move', 'change': 'move',
-                   'teleportate': 'teleportate'}
+                   'teleportate': 'teleportate',
+                   'remove': 'remove'}
 
 correct_directions = ['left', 'right', 'up', 'down', 'back', 'top', 'front']
 directions_to_draw = {'left': 'left', 'right': 'right', 'up': 'up', 'down': 'down', 'back': 'back',
@@ -79,6 +80,10 @@ def add_object_to_memory_base(memory_base, object_name):
     memory_base.append(object_name)
 
 
+def remove_object_from_memory_base(memory_base, object_name):
+    memory_base.remove(object_name)
+
+
 def get_memory_base(memory_base):
     print('Base consist of ' + ', '.join(memory_base))
 
@@ -111,6 +116,11 @@ def get_command_for_teleportate(text, object_name, direction, subject_name):
     command = get_default_command('teleportate', object_name, text)
     command['edge'] = command_direction
     command['subjectName'] = subject_name
+    return command
+
+
+def get_command_for_remove(text, object_name):
+    command = get_default_command('remove', object_name, text)
     return command
 
 
@@ -158,13 +168,22 @@ def text_to_command(text, client):
         else:
             print('Repeat direction')
 
+    if command_type == 'remove':
+        assert len(entities) > 0, 'There is no anything to remove'
+        for object_name in entities:
+            object_in_memory_base = if_object_in_memory_base(memory_base, object_name)
+            if object_in_memory_base:
+                remove_object_from_memory_base(memory_base, object_name)
+                current_command = get_command_for_remove(text, object_name)
+                commands.append(current_command)
+
     return commands
 
 
 def define_command_type(text):
     default_command_type = 'create'
     for word in word_to_command.keys():
-        if word in text:
+        if word in text.split():
             return word_to_command[word]
     return default_command_type
 
