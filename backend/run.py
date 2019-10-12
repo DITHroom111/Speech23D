@@ -21,7 +21,7 @@ def upload():
     audio = types.RecognitionAudio(content=content)
     config = types.RecognitionConfig(
         encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
-        sample_rate_hertz=44100,
+        sample_rate_hertz=48000,
         language_code='en-US',
     )
     response = client.recognize(config, audio)
