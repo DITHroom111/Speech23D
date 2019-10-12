@@ -4,6 +4,49 @@
 const API_KEY = 'AIzaSyC3mTnJ6tywpTUAyBziSRnME63O5nSLOLg';
 
 
+export function processCommand(json, scene) {
+    if (typeof json["commandName"] === 'undefined') {
+        throw new Error("No command name found!");
+    }
+    if (typeof json["objectName"] === 'undefined') {
+        throw new Error("No object name found!");
+    }
+
+    switch(json["commandName"]) {
+        case 'create':
+            alert('create');
+            create(json["objectName"])
+            break;
+        case 'rotate':
+            alert('rotate;);
+            break;
+        case 'move':
+            alert('move');
+            break;
+        case 'teleportate':
+            alert('teleportate');
+            break;
+        case 'makeBigger':
+            alert('makeBigger');
+            break;
+        case 'makeSmaller':
+            alert('makeSmaller');
+            break;
+        default:
+            alert("Unknown command);
+            break;
+    }
+}
+
+
+function create(objectName, scene) {
+    function drawAsset(asset) {
+        drawAssetOnScene(asset, scene);
+    }
+    processFirstAsset(objectName, drawAssetOnScene);
+}
+
+
 function getFirstAsset(data) {
     var assets = data.assets;
     if (assets) {
@@ -24,6 +67,7 @@ function processFirstAsset(keywords, processAsset) {
     });
     request.send(null);
 }
+
 
 function drawAssetOnScene(asset, scene) {
     var format = asset.formats.find( format => { return format.formatType === 'OBJ'; } );

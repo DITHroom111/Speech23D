@@ -1,22 +1,8 @@
+'use strict';
+
+import { processCommand } from 'draw';
+
 //webkitURL is deprecated but nevertheless
-URL = window.URL || window.webkitURL;
-
-const WAV_FILENAME = "speach.wav";
-
-var gumStream; 						//stream from getUserMedia()
-var rec; 							//Recorder.js object
-var input; 							//MediaStreamAudioSourceNode we'll be recording
-
-// shim for AudioContext when it's not avb.
-var AudioContext = window.AudioContext || window.webkitAudioContext;
-var audioContext //audio context to help us record
-
-var recordButton = document.getElementById("recordButton");
-var stopButton = document.getElementById("stopButton");
-
-//add events to those 2 buttons
-recordButton.addEventListener("click", startRecording);
-stopButton.addEventListener("click", stopRecording);
 
 function startRecording() {
 	console.log("recordButton clicked");
@@ -79,7 +65,7 @@ function startRecording() {
 }
 
 
-function stopRecording() {
+function stopRecordingWithScene(scene) {
 	console.log("stopButton clicked");
 
 	//disable the stop button, enable the record too allow for new recordings
@@ -93,19 +79,24 @@ function stopRecording() {
 	gumStream.getAudioTracks()[0].stop();
 
 	//create the wav blob and pass it on to createDownloadLink
+    
+    function uploadWav(blob) {
+        uploadWavWithScene(blob, scene);
+    }
 	rec.exportWAV(uploadWav);
 }
 
-function uploadWav(blob) {
-      var xhr = new XMLHttpRequest();
-      xhr.onload = function(e) {
-          if (this.readyState === 4) {
-              console.log("Server returned: ", e.target.responseText);
-          }
+function uploadWavWithScene(blob, scene) {
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function(e) {
+        if (this.readyState === 4) {
+            console.log("Server returned: ", e.target.responseText);
+        }
         alert(xhr.responseText);
-      };
-      var fd = new FormData();
-      fd.append("audio_data", blob, WAV_FILENAME);
-      xhr.open("POST", "upload", true);
-      xhr.send(fd);
+        processCommand(xhr.responseText, scene);
+    };
+    var fd = new FormData();
+    fd.append("audio_data", blob, WAV_FILENAME);
+    xhr.open("POST", "upload", true);
+    xhr.send(fd);
 }

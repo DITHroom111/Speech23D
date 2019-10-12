@@ -32,6 +32,31 @@
 		<script src="static/third_party/three.js/js/MTLLoader.js"></script>
         <script type="text/javascript" src="static/draw_asset.js"></script> 
         <script>
+            URL = window.URL || window.webkitURL;
+
+            const WAV_FILENAME = "speach.wav";
+
+            var gumStream; 						//stream from getUserMedia()
+            var rec; 							//Recorder.js object
+            var input; 							//MediaStreamAudioSourceNode we'll be recording
+
+            // shim for AudioContext when it's not avb.
+            var AudioContext = window.AudioContext || window.webkitAudioContext;
+            var audioContext //audio context to help us record
+
+            var recordButton = document.getElementById("recordButton");
+            var stopButton = document.getElementById("stopButton");
+
+            function stopRecording() {
+                stopRecordingWithScene(scene);
+            }
+            function startRecording() {
+                startRecordingWithScene(scene);
+            }
+
+            //add events to those 2 buttons
+            recordButton.addEventListener("click", startRecording);
+            stopButton.addEventListener("click", stopRecording);
 
 			// THREE.JS VIEWER
 
@@ -82,7 +107,6 @@
             }
 
             processFirstAsset(["dragon"], drawAsset);
-            processFirstAsset(["dog"], drawAsset);
         </script>
 	</body>
 </html>
