@@ -1,22 +1,29 @@
 from flask import Flask, Response, request, render_template
+from google.cloud.speech import enums, types, SpeechClient
 import pyaudio
+import os
 
 
 app = Flask(__name__)
 
-FORMAT = pyaudio.paInt16
-CHANNELS = 2
-RATE = 44100
-CHUNK = 1024
-RECORD_SECONDS = 5
+client = SpeechClient()
+
+os.environ.setdefault('GOOGLE_APPLICATION_CREDENTIALS', 'key.json')
 
 
 @app.route('/upload', methods=['POST'])
 def upload():
-    raw_audio = request.get_data()
-    with open('recored_file.wav', 'wb') as f_out:
-        f_out.write(raw_audio)
-    return 'joke'
+    raw_audio = request.files['audio_data']
+    content = raw_audio.read()
+    audio = types.RecognitionAudio(content=content)
+    config = types.RecognitionConfig(
+        encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
+        sample_rate_hertz=44100,
+        language_code='en-US',
+    )
+
+    response = client.recognize(config, audio)
+    return response.results[0].alternatives[0].transcript
 
 
 @app.route('/')
