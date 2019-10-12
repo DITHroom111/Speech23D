@@ -1,22 +1,88 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Simple Recorder.js demo with record, stop and pause</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="static/style.css">
-  </head>
-  <body>
-    <div id="controls">
-  	 <button id="recordButton">Record</button>
-  	 <button id="stopButton" disabled>Stop</button>
-    </div>
-    <div id="formats"></div>
-    <ol id="recordingsList"></ol>
+    <head>
+        <meta charset="UTF-8">
+        <title>Simple Recorder.js demo with record, stop and pause</title>
 
-    <!-- inserting these scripts at the end to be able to use all the elements in the DOM -->
-  	<script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
-  	<script src="static/app.js"></script>
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="static/poly_style.css">
+        <link rel="stylesheet" type="text/css" href="static/wav_style.css">
+    </head>
+    <body>
+        <div id="controls">
+            <button id="recordButton">Record</button>
+            <button id="stopButton" disabled>Stop</button>
+        </div>
+        <div id="formats"></div>
+        <ol id="recordingsList"></ol>
 
-  </body>
+        <!-- inserting these scripts at the end to be able to use all the elements in the DOM -->
+        <script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
+        <script src="static/app.js"></script>
+
+		<div id="viewer"></div>
+
+		<div id="info">
+			<span id="asset_name">Title</span><br/>
+			by <span id="asset_author">Author</span>
+		</div>
+
+		<script src="static/third_party/three.js/js/three.min.js"></script>
+		<script src="static/third_party/three.js/js/OBJLoader.js"></script>
+		<script src="static/third_party/three.js/js/MTLLoader.js"></script>
+        <script type="text/javascript" src="static/draw_asset.js"></script> 
+        <script>
+
+			// THREE.JS VIEWER
+
+            const WIDTH = viewer.offsetWidth;
+            const HEIGHT = viewer.offsetHeight;
+
+            var camera = new THREE.PerspectiveCamera( 60, WIDTH / HEIGHT, 0.01, 100 );
+            camera.position.set( 5, 3, 5 );
+            camera.lookAt( 0, 1.5, 0 );
+
+            var scene = new THREE.Scene();
+            scene.background = new THREE.Color( 0x222222 );
+
+            scene.add( new THREE.GridHelper( 10, 10 ) );
+
+            var ambient = new THREE.HemisphereLight( 0xbbbbff, 0x886666, 0.75 );
+            ambient.position.set( -0.5, 0.75, -1 );
+            scene.add( ambient );
+
+            var light = new THREE.DirectionalLight( 0xffffff, 0.75 );
+            light.position.set( 1, 0.75, 0.5 );
+            scene.add( light );
+
+            var renderer = new THREE.WebGLRenderer();
+            renderer.setPixelRatio( window.devicePixelRatio );
+            renderer.setSize( WIDTH, HEIGHT );
+            viewer.appendChild( renderer.domElement );
+
+            function animate() {
+
+                var time = performance.now() / 5000;
+
+                camera.position.x = Math.sin( time ) * 5;
+                camera.position.z = Math.cos( time ) * 5;
+                camera.lookAt( 0, 1.5, 0 );
+
+                renderer.render( scene, camera );
+                requestAnimationFrame( animate );
+
+            }
+
+            requestAnimationFrame( animate );
+
+            // POLY REST API
+
+            function drawAsset(asset) {
+                drawAssetOnScene(asset, scene);
+            }
+
+            processFirstAsset(["dragon"], drawAsset);
+            processFirstAsset(["dog"], drawAsset);
+        </script>
+	</body>
 </html>
