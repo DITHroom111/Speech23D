@@ -10,8 +10,10 @@ function processCommand(json, container, objects) {
     if (typeof json["commandName"] === 'undefined') {
         throw new Error("No command name found!");
     }
-    if (typeof json["objectName"] === 'undefined') {
-        throw new Error("No object name found!");
+    if (json["commandName"] != 'clear') {
+        if (typeof json["objectName"] === 'undefined') {
+            throw new Error("No object name found!");
+        }
     }
 
     switch(json["commandName"]) {
@@ -22,6 +24,10 @@ function processCommand(json, container, objects) {
         case 'remove':
             console.log('remove');
             remove(json["objectName"], container, objects);
+            break;
+        case 'clear':
+            console.log('clear');
+            clear(container, objects);
             break;
         case 'rotate':
             console.log('rotate');
@@ -42,6 +48,13 @@ function processCommand(json, container, objects) {
             console.log("Unknown command");
             break;
     }
+}
+
+function clear(container, objects) {
+    while (container.children.length) {
+        container.remove(container.children[0]);
+    }
+    objects.clear();
 }
 
 function remove(objectName, container, objects) {
