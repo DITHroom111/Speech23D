@@ -221,9 +221,9 @@ def text_to_command(text, client):
             object_in_memory_base = if_object_in_memory_base(object_name)
             if object_in_memory_base:
                 if len(entities) > 1:
-                    angle = float(text2int(entities[1]))
+                    angle = float(text2int(entities[1])) * 3.14 / 180
                 else:
-                    angle = 90.0
+                    angle = 3.14 / 2
                 current_command = get_command_for_rotate(object_name, angle)
                 commands.append(current_command)
 

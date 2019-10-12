@@ -104,8 +104,12 @@ function teleportate(object, subject, edge) {
     }
 }
 
-function rotate(object, angle):
-    object.rotateY(angle);
+function rotate(objectName, container, objects, angle) {
+    objects.get(objectName).rotateY(angle);
+}
+
+function colour(objectName, container, objects, r, g, b) {
+    objects.get(objectName).material.color.setRGB(r, g, b);
 }
 
 function colour(object, r, g, b) {
