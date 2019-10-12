@@ -28,7 +28,9 @@ def upload():
     print(response)
     for result in response.results:
         voice_command = result.alternatives[0].transcript
-        return json.dumps(parse_command(voice_command))
+        parsed_command = parse_command(voice_command)
+        print(parsed_command)
+        return json.dumps(parsed_command)
 
 
 @app.route('/')
