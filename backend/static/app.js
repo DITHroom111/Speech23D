@@ -31,6 +31,7 @@ function processCommand(json, container, objects) {
             break;
         case 'rotate':
             console.log('rotate');
+            rotate(json["objectName"], container, objects, json["angle"]);
             break;
         case 'move':
             console.log('move');
@@ -78,9 +79,15 @@ function processCommand(json, container, objects) {
     }
 }
 
+
+function rotate(objectName, container, objects, angle):
+    objects.get(objectName).rotateY(angle);
+
+
 function colour(objectName, container, objects, r, g, b) {
     objects.get(objectName).material.color.setRGB(r, g, b);
 }
+
 
 const SCALE_MULT = 1.5;
 
