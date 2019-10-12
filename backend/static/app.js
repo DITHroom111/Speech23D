@@ -175,7 +175,6 @@ function processFirstAsset(objectName, processAsset) {
 
 function drawAssetOnScene(asset, container, objects, objectName) {
     var format = asset.formats.find(format => {return format.formatType === 'OBJ';});
-
     if ( format !== undefined ) {
         var obj = format.root;
         var mtl = format.resources.find(resource => {return resource.url.endsWith('mtl')});
@@ -316,4 +315,14 @@ function uploadWavWithScene(blob, container, objects) {
     fd.append("audio_data", blob, "speech.wav");
     xhr.open("POST", "upload", true);
     xhr.send(fd);
+}
+
+function downloadSceneWithScene(scene) {
+    var zip = new JSZip();
+    var oexporter = new THREE.OBJExporter();
+    var result = oexporter.parse(scene);
+    zip.file('mymodel.obj', result.obj);
+    zip.file('objmaterial.mtl', result.mtl);
+    var zz=zip.generate({ type: 'blob' });
+    saveAs(zz, 'mymodel.zip'); 
 }
