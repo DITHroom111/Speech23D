@@ -211,7 +211,7 @@ function uploadWavWithScene(blob, container) {
             console.log("Server returned: ", e.target.responseText);
         }
         console.log(xhr.responseText);
-        if (xhr.responseText == "speech2text failed") {
+        if (xhr.responseText.endsWith("failed")) {
             rawTextField.value = xhr.responseText;
         } else {
             var parsed = JSON.parse(xhr.responseText);
