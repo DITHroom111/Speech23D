@@ -5,7 +5,7 @@
 const API_KEY = 'AIzaSyC3mTnJ6tywpTUAyBziSRnME63O5nSLOLg';
 
 
-function processCommand(json, scene) {
+function processCommand(json, container) {
     console.log(Object.keys(json));
     if (typeof json["commandName"] === 'undefined') {
         throw new Error("No command name found!");
@@ -17,7 +17,7 @@ function processCommand(json, scene) {
     switch(json["commandName"]) {
         case 'create':
             console.log('create');
-            create(json["objectName"], scene);
+            create(json["objectName"], container);
             break;
         case 'rotate':
             console.log('rotate');
@@ -40,9 +40,9 @@ function processCommand(json, scene) {
     }
 }
 
-function create(objectName, scene) {
+function create(objectName, container) {
     function drawAsset(asset) {
-        drawAssetOnScene(asset, scene);
+        drawAssetOnScene(asset, container);
     }
     processFirstAsset(objectName, drawAsset);
 }
@@ -86,7 +86,7 @@ function processFirstAsset(objectName, processAsset) {
 }
 
 
-function drawAssetOnScene(asset, scene) {
+function drawAssetOnScene(asset, container) {
     var format = asset.formats.find(format => {return format.formatType === 'OBJ';});
 
     if ( format !== undefined ) {
@@ -115,7 +115,7 @@ function drawAssetOnScene(asset, scene) {
                 var scaler = new THREE.Group();
                 scaler.add(object);
                 scaler.scale.setScalar(6 / box.getSize().length());
-                scene.add(scaler);
+                container.add(scaler);
             });
         });
     }
@@ -183,7 +183,7 @@ function startRecording() {
 }
 
 
-function stopRecordingWithScene(scene) {
+function stopRecordingWithScene(container) {
 	console.log("stopButton clicked");
 
 	//disable the stop button, enable the record too allow for new recordings
@@ -199,12 +199,12 @@ function stopRecordingWithScene(scene) {
 	//create the wav blob and pass it on to createDownloadLink
 
     function uploadWav(blob) {
-        uploadWavWithScene(blob, scene);
+        uploadWavWithScene(blob, container);
     }
 	rec.exportWAV(uploadWav);
 }
 
-function uploadWavWithScene(blob, scene) {
+function uploadWavWithScene(blob, container) {
     var xhr = new XMLHttpRequest();
     xhr.onload = function(e) {
         if (this.readyState === 4) {
@@ -221,7 +221,7 @@ function uploadWavWithScene(blob, scene) {
             console.log(commands.length);
             for (var i = 0; i < commands.length; ++i) {
                 console.log(i);
-                processCommand(commands[i], scene);
+                processCommand(commands[i], container);
             }
         }
     };

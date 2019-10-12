@@ -81,6 +81,10 @@
             var stopButton = document.getElementById("stopButton");
             var rawTextField = document.getElementById("rawTextField");
 
+            function stopRecording() {
+                stopRecordingWithScene(container);
+            }
+
             //add events to those 2 buttons
             recordButton.addEventListener("click", startRecording);
             stopButton.addEventListener("click", stopRecording);
