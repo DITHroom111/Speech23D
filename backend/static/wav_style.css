@@ -50,3 +50,8 @@ button:first-child {
     top: 12%; left: 1rem;
     font-size: 1.2rem;
 }
+#inputModel {
+    width:500px;
+    height:40px;
+    font-size: 1.1rem;
+}

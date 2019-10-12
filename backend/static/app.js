@@ -332,6 +332,35 @@ function uploadWavWithScene(blob, container, objects) {
     xhr.send(fd);
 }
 
+function uploadTextWithScene(text, container, objects) {
+    console.log("get form with text: " + text);
+
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function(e) {
+        if (this.readyState === 4) {
+            console.log("Server returned: ", e.target.responseText);
+        }
+        console.log("responceText: " + xhr.responseText);
+        if (xhr.responseText.endsWith("failed")) {
+            rawTextField.innerHTML = xhr.responseText;
+        } else {
+            var parsed = JSON.parse(xhr.responseText);
+            rawTextField.innerHTML = parsed["rawText"];
+            var commands = parsed["commands"];
+            console.log(commands);
+            for (var i = 0; i < commands.length; ++i) {
+                console.log(i);
+                processCommand(commands[i], container, objects);
+            }
+        }
+    };
+    var fd = new FormData();
+    fd.append("text", text);
+    xhr.open("POST", "upload_text", true);
+    xhr.send(fd);
+
+}
+
 function downloadSceneWithScene(scene) {
     var zip = new JSZip();
     var oexporter = new THREE.OBJExporter();

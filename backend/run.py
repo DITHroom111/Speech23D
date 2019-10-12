@@ -22,8 +22,7 @@ def upload():
     audio = types.RecognitionAudio(content=content)
     config = types.RecognitionConfig(
         encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
-        language_code='en-US',
-    )
+        language_code='en-US',)
     response = client.recognize(config, audio)
     print(response)
     for result in response.results:
@@ -42,6 +41,19 @@ def upload():
 def init_recorder():
     return render_template('index.html')
 
+
+@app.route('/upload_text', methods=['POST'])
+def upload_text():
+   text_command = request.form.get("text")
+   print(request.form)
+   try:
+       parsed_command = parse_command(text_command)
+   except Exception as e:
+       traceback.print_exc()
+       return '"{}" command parsing failed'.format(text_command)
+   print(parsed_command)
+   return json.dumps(parsed_command)  
+    
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=True, port=5000)

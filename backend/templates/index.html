@@ -21,6 +21,9 @@
 
 		<div id="viewer"></div>
 
+            <input type="text" id="inputModel" name="text"></input>
+            <button id="uploadTextButton">Upload Text</button>
+        </form>
 		<div id="info">
 			<span id="asset_name">Title</span><br/>
 			by <span id="asset_author">Author</span>
@@ -83,6 +86,7 @@
             var recordButton = document.getElementById("recordButton");
             var stopButton = document.getElementById("stopButton");
             var downloadButton = document.getElementById("downloadButton");
+            var uploadTextButton = document.getElementById("uploadTextButton");
             var rawTextField = document.getElementById("rawTextField");
             var gumStream;
             var rec;
@@ -95,10 +99,18 @@
                 downloadSceneWithScene(scene);
             }
 
+            function uploadText() {
+                var text_form = document.getElementById("inputModel").value; 
+                
+                console.log("send form to uploadText, text: " + text_form)
+                uploadTextWithScene(text_form, container, objects)
+            }
+
             //add events to those 2 buttons
             recordButton.addEventListener("click", startRecording);
             stopButton.addEventListener("click", stopRecording);
             downloadButton.addEventListener("click", downloadScene);
+            uploadTextButton.addEventListener("click", uploadText);
         </script>
 	</body>
 </html>
