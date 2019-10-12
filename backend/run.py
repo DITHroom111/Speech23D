@@ -9,9 +9,9 @@ from parse_command import parse_command
 
 app = Flask(__name__)
 
-client = SpeechClient()
-
 os.environ.setdefault('GOOGLE_APPLICATION_CREDENTIALS', 'key.json')
+
+client = SpeechClient()
 
 
 @app.route('/upload', methods=['POST'])
