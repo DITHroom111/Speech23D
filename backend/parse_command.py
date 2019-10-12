@@ -18,6 +18,9 @@ correct_directions = ['left', 'right', 'up', 'down', 'back', 'top', 'front']
 directions_to_draw = {'left': 'left', 'right': 'right', 'up': 'up', 'down': 'down', 'back': 'back',
                       'top': 'front', 'front': 'front'}
 correct_colours = ['green', 'red', 'white', 'yellow', 'blue', 'black', 'brown', 'pink']
+colour_to_rgb = {'green': (0.0, 1.0, 0.0), 'red': (1.0, 0.0, 0.0), 'white': (1.0, 1.0, 1.0),
+                 'yellow': (1.0, 1.0, 0.0), 'blue': (0.0, 0.0, 1.0), 'black': (0.0, 0.0, 0.0),
+                 'brown': (0.4, 0.0, 0.0), 'pink': (1.0, 0.0, 1.0)}
 
 memory_base = []
 
@@ -159,7 +162,10 @@ def get_command_for_clear():
 
 def get_command_for_colour(object_name, colour):
     command = get_default_command('makeSmaller', object_name)
-    command['colour'] = colour
+    rgb_colour = colour_to_rgb[colour]
+    command['r'] = rgb_colour[0]
+    command['g'] = rgb_colour[1]
+    command['b'] = rgb_colour[2]
     return command
 
 
