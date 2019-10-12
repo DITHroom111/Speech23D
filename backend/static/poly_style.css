@@ -18,10 +18,6 @@ html, body {
 #asset_author {
     color: #888;
 }
-audio {
-  display: block;
-  width: 100%;
-}
 li {
   list-style: none;
 }

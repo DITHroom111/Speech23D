@@ -1,10 +1,9 @@
 #controls {
   display: flex;
-  margin-top: 2rem;
   max-width: 28rem;
+  margin: 1rem;
   min-width: 28rem;
   position: absolute;
-  top: 5%;
   overflow: hidden;
 }
 button {
@@ -41,4 +40,12 @@ button:disabled {
 }
 button:first-child {
   margin-left: 0;
+}
+#rawTextField {
+    width:100px;
+    height:100px;
+    background-color:#222222;
+    color:#888888;
+    position: absolute;
+    top: 10%; left: 1rem;
 }
