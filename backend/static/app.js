@@ -48,8 +48,10 @@ function create(objectName, scene) {
 }
 
 function findAssetWithExactTitle(text, assets) {
+    console.log(text);
     for (var i = 0; i < assets.length; ++i) {
-        if (assets[i].displayName == text) {
+        console.log(assets[i].displayName);
+        if (assets[i].displayName.toLowerCase() == text) {
             return i;
         }
     }
@@ -208,14 +210,19 @@ function uploadWavWithScene(blob, scene) {
             console.log("Server returned: ", e.target.responseText);
         }
         console.log(xhr.responseText);
-        var parsed = JSON.parse(xhr.responseText);
-        var rawText = parsed["rawText"];
-        var commands = parsed["commands"];
-        console.log(commands);
-        console.log(commands.length);
-        for (var i = 0; i < commands.length; ++i) {
-            console.log(i);
-            processCommand(commands[i], scene);
+        var rawText;
+        if (xhr.responseText == "speech2text failed") {
+            rawText = xhr.responseText;
+        } else {
+            var parsed = JSON.parse(xhr.responseText);
+            rawText = parsed["rawText"];
+            var commands = parsed["commands"];
+            console.log(commands);
+            console.log(commands.length);
+            for (var i = 0; i < commands.length; ++i) {
+                console.log(i);
+                processCommand(commands[i], scene);
+            }
         }
     };
     var fd = new FormData();

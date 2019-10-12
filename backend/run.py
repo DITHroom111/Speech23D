@@ -31,6 +31,7 @@ def upload():
         parsed_command = parse_command(voice_command)
         print(parsed_command)
         return json.dumps(parsed_command)
+    return 'speech2text failed'
 
 
 @app.route('/')
