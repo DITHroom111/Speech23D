@@ -4,14 +4,16 @@ from google.cloud.language import enums
 from google.cloud.language import types
 
 word_to_command = {'rotate': 'rotate', 'turn': 'rotate', 'spin': 'rotate', 'twist': 'rotate',
+                   'color': 'colour', 'colour': 'colour', 'green': 'colour' , 'red': 'colour',
+                   'white': 'colour', 'yellow': 'colour', 'blue': 'colour', 'black': 'colour',
+                   'brown': 'colour', 'pink': 'colour',
                    'on': 'teleportate', 'under': 'teleportate', 'teleportate': 'teleportate',
                    'create': 'create', 'add': 'create', 'draw': 'create', 'print': 'create', 'put': 'create',
                    'move': 'move', 'fly': 'move', 'go': 'move', 'jump': 'move', 'change': 'move',
                    'remove': 'remove', 'delete': 'remove',
                    'bigger': 'make bigger', 'big': 'make bigger', 'larger': 'make bigger', 'large': 'make bigger',
                    'smaller': 'make smaller', 'small': 'make smaller', 'reduce': 'make smaller',
-                   'clear': 'clear',
-                   'color': 'colour', 'colour': 'colour'}
+                   'clear': 'clear'}
 objects_belonging = {'everything': 'every'}
 
 correct_directions = ['left', 'right', 'up', 'down', 'back', 'top', 'front', 'on', 'under']
@@ -162,7 +164,7 @@ def get_command_for_clear():
 
 
 def get_command_for_colour(object_name, colour):
-    command = get_default_command('makeSmaller', object_name)
+    command = get_default_command('colour', object_name)
     rgb_colour = colour_to_rgb[colour]
     command['r'] = rgb_colour[0]
     command['g'] = rgb_colour[1]
