@@ -65,6 +65,9 @@ function processCommand(json, container, objects) {
             console.log('makeBigger');
             makeSmaller(json["objectName"], container, objects);
             break;
+        case 'colour':
+            console.log('colour');
+            colour(json["objectName"], container, objects, json["r"], json["g"], json["b"]);
         case 'makeSmaller':
             console.log('makeSmaller');
             makeBigger(json["objectName"], container, objects);
@@ -73,6 +76,10 @@ function processCommand(json, container, objects) {
             console.log("Unknown command");
             break;
     }
+}
+
+function colour(objectName, container, objects, r, g, b) {
+    objects.get(objectName).material.color.setRGB(r, g, b);
 }
 
 const SCALE_MULT = 1.5;
