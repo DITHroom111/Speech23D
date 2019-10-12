@@ -63,15 +63,30 @@ function processCommand(json, container, objects) {
             break;
         case 'makeBigger':
             console.log('makeBigger');
+            makeSmaller(json["objectName"], container, objects);
             break;
         case 'makeSmaller':
             console.log('makeSmaller');
+            makeBigger(json["objectName"], container, objects);
             break;
         default:
             console.log("Unknown command");
             break;
     }
 }
+
+const SCALE_MULT = 1.5;
+
+function makeBigger(objectName, container, objects) {
+    Matrix4 biggerMatrix = TREE.Matrix4.makeScale(SCALE_MULT, SCALE_MULT, SCALE_NULT);
+    objects.get(objectName).applyMatrix(biggerMatrix);
+}
+
+function makeSmaller(objectName, container, objects) {
+    Matrix4 smallerMatrix = TREE.Matrix4.makeScale(1.0 / SCALE_MULT, 1.0 / SCALE_MULT, 1.0 / SCALE_NULT);
+    objects.get(objectName).applyMatrix(smallerMatrix);
+}
+
 
 const MOVE_STEP = 100;
 
