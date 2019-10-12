@@ -97,34 +97,34 @@ def get_default_command(command_type, object_name):
     return command
 
 
-def get_command_for_create(text, object_name):
-    command = get_default_command('create', object_name, text)
+def get_command_for_create(object_name):
+    command = get_default_command('create', object_name)
     return command
 
 
-def get_command_for_rotate(text, object_name, angle):
-    command = get_default_command('rotate', object_name, text)
+def get_command_for_rotate(object_name, angle):
+    command = get_default_command('rotate', object_name)
     command['angle'] = angle
     return command
 
 
-def get_command_for_move(text, object_name, direction):
+def get_command_for_move(object_name, direction):
     command_direction = directions_to_draw[direction]
-    command = get_default_command('move', object_name, text)
+    command = get_default_command('move', object_name)
     command['type'] = command_direction
     return command
 
 
-def get_command_for_teleportate(text, object_name, direction, subject_name):
+def get_command_for_teleportate(object_name, direction, subject_name):
     command_direction = directions_to_draw[direction]
-    command = get_default_command('teleportate', object_name, text)
+    command = get_default_command('teleportate', object_name)
     command['edge'] = command_direction
     command['subjectName'] = subject_name
     return command
 
 
-def get_command_for_remove(text, object_name):
-    command = get_default_command('remove', object_name, text)
+def get_command_for_remove(object_name):
+    command = get_default_command('remove', object_name)
     return command
 
 
@@ -142,14 +142,14 @@ def text_to_command(text, client):
             object_in_memory_base = if_object_in_memory_base(memory_base, object_name)
             if not object_in_memory_base:
                 add_object_to_memory_base(memory_base, object_name)
-                current_command = get_command_for_create(text, object_name)
+                current_command = get_command_for_create(object_name)
                 commands.append(current_command)
 
     if command_type == 'rotate':
         assert len(entities) == 2, 'How much to turn'
         object_name = entities[0]
         angle = float(text2int(entities[1]))
-        current_command = get_command_for_rotate(text, object_name, angle)
+        current_command = get_command_for_rotate(object_name, angle)
         commands.append(current_command)
 
     if command_type == 'move':
@@ -158,7 +158,7 @@ def text_to_command(text, client):
         direction = entities[1]
         direction_is_correct = if_direction_is_correct(direction)
         if direction_is_correct:
-            current_command = get_command_for_move(text, object_name, direction)
+            current_command = get_command_for_move(object_name, direction)
             commands.append(current_command)
         else:
             print('Repeat direction')
@@ -170,7 +170,7 @@ def text_to_command(text, client):
         subject_name = entities[2]
         direction_is_correct = if_direction_is_correct(direction)
         if direction_is_correct:
-            current_command = get_command_for_teleportate(text, object_name, direction, subject_name)
+            current_command = get_command_for_teleportate(object_name, direction, subject_name)
             commands.append(current_command)
         else:
             print('Repeat direction')
@@ -181,7 +181,7 @@ def text_to_command(text, client):
             object_in_memory_base = if_object_in_memory_base(memory_base, object_name)
             if object_in_memory_base:
                 remove_object_from_memory_base(memory_base, object_name)
-                current_command = get_command_for_remove(text, object_name)
+                current_command = get_command_for_remove(object_name)
                 commands.append(current_command)
 
     return commands
