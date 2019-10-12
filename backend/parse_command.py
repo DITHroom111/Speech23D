@@ -10,12 +10,14 @@ word_to_command = {'rotate': 'rotate', 'turn': 'rotate', 'spin': 'rotate', 'twis
                    'remove': 'remove', 'delete': 'remove',
                    'bigger': 'make bigger', 'big': 'make bigger', 'larger': 'make bigger', 'large': 'make bigger',
                    'smaller': 'make smaller', 'small': 'make smaller', 'reduce': 'make smaller',
-                   'clear': 'clear'}
+                   'clear': 'clear',
+                   'color': 'colour', 'colour': 'colour'}
 objects_belonging = {'everything': 'every'}
 
 correct_directions = ['left', 'right', 'up', 'down', 'back', 'top', 'front']
 directions_to_draw = {'left': 'left', 'right': 'right', 'up': 'up', 'down': 'down', 'back': 'back',
                       'top': 'front', 'front': 'front'}
+correct_colours = ['green', 'red', 'white', 'yellow', 'blue', 'black', 'brown', 'pink']
 
 memory_base = []
 
@@ -155,6 +157,12 @@ def get_command_for_clear():
     return command
 
 
+def get_command_for_colour(object_name, colour):
+    command = get_default_command('makeSmaller', object_name)
+    command['colour'] = colour
+    return command
+
+
 def remove_directions_from_text(text, direction):
     new_text = text.split()
     new_text.remove(direction)
@@ -187,13 +195,15 @@ def text_to_command(text, client):
         if object_belonging == 'one':
             object_name = entities[0]
             objects_to_rotate.append(object_name)
-            assert len(entities) == 2, 'How much to turn'
         if object_belonging == 'every':
             objects_to_rotate = get_memory_base(memory_base)
         for object_name in objects_to_rotate:
             object_in_memory_base = if_object_in_memory_base(memory_base, object_name)
             if object_in_memory_base:
-                angle = float(text2int(entities[1]))
+                if len(entities) > 1:
+                    angle = float(text2int(entities[1]))
+                else:
+                    angle = 90.0
                 current_command = get_command_for_rotate(object_name, angle)
                 commands.append(current_command)
 
@@ -244,16 +254,24 @@ def text_to_command(text, client):
                 commands.append(current_command)
 
     if command_type == 'make bigger':
-        assert len(entities) > 0, 'There is no object to make it bigger'
-        for object_name in entities:
+        objects_to_make_bigger = []
+        if object_belonging == 'one':
+            objects_to_make_bigger = entities.copy()
+        if object_belonging == 'every':
+            objects_to_make_bigger = get_memory_base(memory_base)
+        for object_name in objects_to_make_bigger:
             object_in_memory_base = if_object_in_memory_base(memory_base, object_name)
             if object_in_memory_base:
                 current_command = get_command_for_make_bigger(object_name)
                 commands.append(current_command)
 
     if command_type == 'make smaller':
-        assert len(entities) > 0, 'There is no object to make it smaller'
-        for object_name in entities:
+        objects_to_make_smaller = []
+        if object_belonging == 'one':
+            objects_to_make_smaller = entities.copy()
+        if object_belonging == 'every':
+            objects_to_make_smaller = get_memory_base(memory_base)
+        for object_name in objects_to_make_smaller:
             object_in_memory_base = if_object_in_memory_base(memory_base, object_name)
             if object_in_memory_base:
                 current_command = get_command_for_make_smaller(object_name)
@@ -263,6 +281,20 @@ def text_to_command(text, client):
         clear_memory_base(memory_base)
         current_command = get_command_for_clear()
         commands.append(current_command)
+
+    if command_type == 'colour':
+        objects_to_colour = []
+        if object_belonging == 'one':
+            objects_to_colour = entities.copy()
+        if object_belonging == 'every':
+            objects_to_colour = get_memory_base(memory_base)
+        colour = find_colour_in_text(text)
+        if colour:
+            for object_name in objects_to_colour:
+                object_in_memory_base = if_object_in_memory_base(memory_base, object_name)
+                if object_in_memory_base:
+                    current_command = get_command_for_colour(object_name, colour)
+                    commands.append(current_command)
 
     return commands
 
@@ -290,6 +322,13 @@ def define_directions(text):
     for direction in correct_directions:
         if direction in splitted_text:
             return direction
+    return None
+
+
+def find_colour_in_text(text):
+    for correct_colour in correct_colours:
+        if correct_colour in text.split():
+            return correct_colour
     return None
 
 
