@@ -13,6 +13,7 @@
             <button id="recordButton">Record</button>
             <button id="stopButton" disabled>Stop</button>
         </div>
+        <input type="text" id="rawTextField"></input>
         <div id="formats"></div>
         <ol id="recordingsList"></ol>
 
@@ -85,6 +86,7 @@
 
             var recordButton = document.getElementById("recordButton");
             var stopButton = document.getElementById("stopButton");
+            var rawTextField = document.getElementById("rawTextField");
 
             //add events to those 2 buttons
             recordButton.addEventListener("click", startRecording);

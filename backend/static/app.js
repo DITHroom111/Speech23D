@@ -137,6 +137,7 @@ function startRecording() {
 
 	recordButton.disabled = true;
 	stopButton.disabled = false;
+    rawTextField.value = "tell me a command!";
 
 	/*
     	We're using the standard promise based getUserMedia()
@@ -210,12 +211,11 @@ function uploadWavWithScene(blob, scene) {
             console.log("Server returned: ", e.target.responseText);
         }
         console.log(xhr.responseText);
-        var rawText;
         if (xhr.responseText == "speech2text failed") {
-            rawText = xhr.responseText;
+            rawTextField.value = xhr.responseText;
         } else {
             var parsed = JSON.parse(xhr.responseText);
-            rawText = parsed["rawText"];
+            rawTextField.value = parsed["rawText"];
             var commands = parsed["commands"];
             console.log(commands);
             console.log(commands.length);
