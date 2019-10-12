@@ -97,14 +97,20 @@ function stopRecording() {
 }
 
 function uploadWav(blob) {
-      var xhr=new XMLHttpRequest();
-      xhr.onload=function(e) {
-          if(this.readyState === 4) {
-              console.log("Server returned: ",e.target.responseText);
+      var xhr = new XMLHttpRequest();
+      xhr.onload = function(e) {
+          if (this.readyState === 4) {
+              console.log("Server returned: ", e.target.responseText);
           }
       };
-      var fd=new FormData();
+      var fd = new FormData();
       fd.append("audio_data", blob, WAV_FILENAME);
       xhr.open("POST", "upload", true);
       xhr.send(fd);
+
+    if (xhr.status != 200) {
+      alert("Upload wav error!");
+    } else {
+      alert(xhr.responseText);
+    }
 }
