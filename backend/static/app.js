@@ -88,30 +88,30 @@ function makeSmaller(objectName, container, objects) {
 }
 
 
-const MOVE_STEP = 100;
+const MOVE_STEP = 1;
 
 function up(objectName, container, objects) {
-    objects.get(objectName).translateZ(MOVE_STEP);
-}
-
-function down(objectName, container, objects) {
-    objects.get(objectName).translateZ(-MOVE_STEP);
-}
-
-function left(objectName, container, objects) {
-    objects.get(objectName).translateX(MOVE_STEP);
-}
-
-function right(objectName, container, objects) {
-    objects.get(objectName).translateX(-MOVE_STEP);
-}
-
-function front(objectName, container, objects) {
     objects.get(objectName).translateY(MOVE_STEP);
 }
 
-function back(objectName, container, objects) {
+function down(objectName, container, objects) {
     objects.get(objectName).translateY(-MOVE_STEP);
+}
+
+function left(objectName, container, objects) {
+    objects.get(objectName).translateX(-MOVE_STEP);
+}
+
+function right(objectName, container, objects) {
+    objects.get(objectName).translateX(MOVE_STEP);
+}
+
+function front(objectName, container, objects) {
+    objects.get(objectName).translateZ(MOVE_STEP);
+}
+
+function back(objectName, container, objects) {
+    objects.get(objectName).translateZ(-MOVE_STEP);
 }
 
 
@@ -324,5 +324,5 @@ function downloadSceneWithScene(scene) {
     zip.file('mymodel.obj', result.obj);
     zip.file('objmaterial.mtl', result.mtl);
     var zz=zip.generate({ type: 'blob' });
-    saveAs(zz, 'mymodel.zip'); 
+    saveAs(zz, 'mymodel.zip');
 }

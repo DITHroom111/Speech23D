@@ -3,6 +3,7 @@ from google.cloud.speech import enums, types, SpeechClient
 
 import json
 import os
+import traceback
 
 from parse_command import parse_command
 
@@ -30,6 +31,7 @@ def upload():
         try:
             parsed_command = parse_command(voice_command)
         except Exception as e:
+            traceback.print_exc()
             return '"{}" command parsing failed'.format(voice_command)
         print(parsed_command)
         return json.dumps(parsed_command)
