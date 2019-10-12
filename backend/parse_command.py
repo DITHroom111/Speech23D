@@ -4,11 +4,12 @@ from google.cloud.language import enums
 from google.cloud.language import types
 
 word_to_command = {'rotate': 'rotate', 'turn': 'rotate', 'spin': 'rotate', 'twist': 'rotate',
-                   'color': 'colour', 'colour': 'colour', 'green': 'colour' , 'red': 'colour',
+                   'color': 'colour', 'colour': 'colour', 'green': 'colour', 'red': 'colour',
                    'white': 'colour', 'yellow': 'colour', 'blue': 'colour', 'black': 'colour',
                    'brown': 'colour', 'pink': 'colour',
-                   'on': 'teleportate', 'under': 'teleportate', 'teleportate': 'teleportate',
-                   'create': 'create', 'add': 'create', 'draw': 'create', 'print': 'create', 'put': 'create',
+                   'on': 'create_and_teleportate', 'under': 'create_and_teleportate',
+                   'teleportate': 'teleportate', 'put': 'teleportate',
+                   'create': 'create', 'add': 'create', 'draw': 'create', 'print': 'create',
                    'move': 'move', 'fly': 'move', 'go': 'move', 'jump': 'move', 'change': 'move',
                    'remove': 'remove', 'delete': 'remove',
                    'bigger': 'make bigger', 'big': 'make bigger', 'larger': 'make bigger', 'large': 'make bigger',
@@ -86,29 +87,29 @@ def if_direction_is_correct(direction):
     return False
 
 
-def if_object_in_memory_base(memory_base, object_name):
+def if_object_in_memory_base(object_name):
     if object_name in memory_base:
         return True
     return False
 
 
-def add_object_to_memory_base(memory_base, object_name):
+def add_object_to_memory_base(object_name):
     memory_base.append(object_name)
 
 
-def remove_object_from_memory_base(memory_base, object_name):
+def remove_object_from_memory_base(object_name):
     memory_base.remove(object_name)
 
 
-def print_memory_base(memory_base):
+def print_memory_base():
     print('Base consist of ' + ', '.join(memory_base))
 
 
-def get_memory_base(memory_base):
+def get_memory_base():
     return memory_base.copy()
 
 
-def clear_memory_base(memory_base):
+def clear_memory_base():
     memory_base.clear()
 
 
@@ -138,6 +139,14 @@ def get_command_for_move(object_name, direction):
 def get_command_for_teleportate(object_name, direction, subject_name):
     command_direction = directions_to_draw[direction]
     command = get_default_command('teleportate', object_name)
+    command['edge'] = command_direction
+    command['subjectName'] = subject_name
+    return command
+
+
+def get_command_for_create_and_teleportate(object_name, direction, subject_name):
+    command_direction = directions_to_draw[direction]
+    command = get_default_command('createAndTeleportate', object_name)
     command['edge'] = command_direction
     command['subjectName'] = subject_name
     return command
@@ -193,9 +202,11 @@ def text_to_command(text, client):
     if command_type == 'create':
         assert len(entities) > 0, 'There is no anything to create'
         for object_name in entities:
-            object_in_memory_base = if_object_in_memory_base(memory_base, object_name)
+            object_in_memory_base = if_object_in_memory_base(object_name)
             if not object_in_memory_base:
-                add_object_to_memory_base(memory_base, object_name)
+                print(memory_base)
+                add_object_to_memory_base(object_name)
+                print(memory_base)
                 current_command = get_command_for_create(object_name)
                 commands.append(current_command)
 
@@ -205,9 +216,9 @@ def text_to_command(text, client):
             object_name = entities[0]
             objects_to_rotate.append(object_name)
         if object_belonging == 'every':
-            objects_to_rotate = get_memory_base(memory_base)
+            objects_to_rotate = get_memory_base()
         for object_name in objects_to_rotate:
-            object_in_memory_base = if_object_in_memory_base(memory_base, object_name)
+            object_in_memory_base = if_object_in_memory_base(object_name)
             if object_in_memory_base:
                 if len(entities) > 1:
                     angle = float(text2int(entities[1]))
@@ -222,10 +233,10 @@ def text_to_command(text, client):
             object_name = entities[0]
             objects_to_move.append(object_name)
         if object_belonging == 'every':
-            objects_to_move = get_memory_base(memory_base)
+            objects_to_move = get_memory_base()
         direction_is_correct = if_direction_is_correct(direction)
         for object_name in objects_to_move:
-            object_in_memory_base = if_object_in_memory_base(memory_base, object_name)
+            object_in_memory_base = if_object_in_memory_base(object_name)
             if object_in_memory_base:
                 if direction_is_correct:
                     current_command = get_command_for_move(object_name, direction)
@@ -237,14 +248,14 @@ def text_to_command(text, client):
         object_name = entities[0]
         subject_name = entities[1]
         direction_is_correct = if_direction_is_correct(direction)
-        object_in_memory_base = if_object_in_memory_base(memory_base, object_name)
-        subject_in_memory_base = if_object_in_memory_base(memory_base, subject_name)
+        object_in_memory_base = if_object_in_memory_base(object_name)
+        subject_in_memory_base = if_object_in_memory_base(subject_name)
         if not object_in_memory_base:
-            add_object_to_memory_base(memory_base, object_name)
+            add_object_to_memory_base(object_name)
             current_command = get_command_for_create(object_name)
             commands.append(current_command)
         if not subject_in_memory_base:
-            add_object_to_memory_base(memory_base, subject_name)
+            add_object_to_memory_base(subject_name)
             current_command = get_command_for_create(subject_name)
             commands.append(current_command)
         if direction_is_correct:
@@ -259,11 +270,11 @@ def text_to_command(text, client):
             assert len(entities) > 0, 'There is no anything to remove'
             objects_to_delete = entities.copy()
         if object_belonging == 'every':
-            objects_to_delete = get_memory_base(memory_base)
+            objects_to_delete = get_memory_base()
         for object_name in objects_to_delete:
-            object_in_memory_base = if_object_in_memory_base(memory_base, object_name)
+            object_in_memory_base = if_object_in_memory_base(object_name)
             if object_in_memory_base:
-                remove_object_from_memory_base(memory_base, object_name)
+                remove_object_from_memory_base(object_name)
                 current_command = get_command_for_remove(object_name)
                 commands.append(current_command)
 
@@ -272,9 +283,9 @@ def text_to_command(text, client):
         if object_belonging == 'one':
             objects_to_make_bigger = entities.copy()
         if object_belonging == 'every':
-            objects_to_make_bigger = get_memory_base(memory_base)
+            objects_to_make_bigger = get_memory_base()
         for object_name in objects_to_make_bigger:
-            object_in_memory_base = if_object_in_memory_base(memory_base, object_name)
+            object_in_memory_base = if_object_in_memory_base(object_name)
             if object_in_memory_base:
                 current_command = get_command_for_make_bigger(object_name)
                 commands.append(current_command)
@@ -284,31 +295,49 @@ def text_to_command(text, client):
         if object_belonging == 'one':
             objects_to_make_smaller = entities.copy()
         if object_belonging == 'every':
-            objects_to_make_smaller = get_memory_base(memory_base)
+            objects_to_make_smaller = get_memory_base()
         for object_name in objects_to_make_smaller:
-            object_in_memory_base = if_object_in_memory_base(memory_base, object_name)
+            object_in_memory_base = if_object_in_memory_base(object_name)
             if object_in_memory_base:
                 current_command = get_command_for_make_smaller(object_name)
                 commands.append(current_command)
 
     if command_type == 'clear':
-        clear_memory_base(memory_base)
+        clear_memory_base()
         current_command = get_command_for_clear()
         commands.append(current_command)
 
     if command_type == 'colour':
+        print('we are in colour')
+        print(entities)
         objects_to_colour = []
         if object_belonging == 'one':
             objects_to_colour = entities.copy()
         if object_belonging == 'every':
-            objects_to_colour = get_memory_base(memory_base)
+            objects_to_colour = get_memory_base()
         colour = find_colour_in_text(text)
         if colour:
+            print(colour)
             for object_name in objects_to_colour:
-                object_in_memory_base = if_object_in_memory_base(memory_base, object_name)
+                print('first', object_name)
+                object_in_memory_base = if_object_in_memory_base(object_name)
                 if object_in_memory_base:
+                    print('second', object_name)
                     current_command = get_command_for_colour(object_name, colour)
+                    print(current_command)
                     commands.append(current_command)
+
+    if command_type == 'create_and_teleportate':
+        object_name = entities[0]
+        subject_name = entities[1]
+        direction_is_correct = if_direction_is_correct(direction)
+        subject_in_memory_base = if_object_in_memory_base(subject_name)
+        if subject_in_memory_base:
+            if direction_is_correct:
+                current_command = get_command_for_create_and_teleportate(object_name, direction, subject_name)
+                commands.append(current_command)
+            else:
+                print('Repeat direction')
 
     return commands
 
