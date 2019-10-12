@@ -39,50 +39,45 @@
             const WIDTH = viewer.offsetWidth;
             const HEIGHT = viewer.offsetHeight;
 
-            var camera = new THREE.PerspectiveCamera( 60, WIDTH / HEIGHT, 0.01, 100 );
+            var camera = new THREE.PerspectiveCamera(60, WIDTH / HEIGHT, 0.01, 100);
             camera.position.set( 5, 3, 5 );
             camera.lookAt( 0, 1.5, 0 );
 
             var scene = new THREE.Scene();
-            scene.background = new THREE.Color( 0x222222 );
+            scene.background = new THREE.Color(0x222222);
 
-            scene.add( new THREE.GridHelper( 10, 10 ) );
+            scene.add(new THREE.GridHelper(10, 10));
 
-            var ambient = new THREE.HemisphereLight( 0xbbbbff, 0x886666, 0.75 );
-            ambient.position.set( -0.5, 0.75, -1 );
-            scene.add( ambient );
+            var ambient = new THREE.HemisphereLight(0xbbbbff, 0x886666, 0.75);
+            ambient.position.set(-0.5, 0.75, -1);
+            scene.add(ambient);
 
-            var light = new THREE.DirectionalLight( 0xffffff, 0.75 );
-            light.position.set( 1, 0.75, 0.5 );
-            scene.add( light );
+            var light = new THREE.DirectionalLight(0xffffff, 0.75);
+            light.position.set(1, 0.75, 0.5);
+            scene.add(light);
 
             var renderer = new THREE.WebGLRenderer();
-            renderer.setPixelRatio( window.devicePixelRatio );
-            renderer.setSize( WIDTH, HEIGHT );
-            viewer.appendChild( renderer.domElement );
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(WIDTH, HEIGHT);
+            viewer.appendChild(renderer.domElement);
+
+			var container = new THREE.Group();
+			scene.add(container);
+
+            let objects = new Map();
 
             function animate() {
-
                 var time = performance.now() / 5000;
 
-                camera.position.x = Math.sin( time ) * 5;
-                camera.position.z = Math.cos( time ) * 5;
-                camera.lookAt( 0, 1.5, 0 );
+                camera.position.x = Math.sin(time) * 5;
+                camera.position.z = Math.cos(time) * 5;
+                camera.lookAt(0, 1.5, 0);
 
-                renderer.render( scene, camera );
-                requestAnimationFrame( animate );
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
 
             }
-
-            requestAnimationFrame( animate );
-
-            URL = window.URL || window.webkitURL;
-
-            const WAV_FILENAME = "speach.wav";
-
-            var gumStream; 						//stream from getUserMedia()
-            var rec; 							//Recorder.js object
-            var input; 							//MediaStreamAudioSourceNode we'll be recording
+            requestAnimationFrame(animate);
 
             var recordButton = document.getElementById("recordButton");
             var stopButton = document.getElementById("stopButton");
@@ -91,16 +86,6 @@
             //add events to those 2 buttons
             recordButton.addEventListener("click", startRecording);
             stopButton.addEventListener("click", stopRecording);
-
-            // shim for AudioContext when it's not avb.
-            var AudioContext = window.AudioContext || window.webkitAudioContext;
-            var audioContext //audio context to help us record
-
-            function stopRecording() {
-                stopRecordingWithScene(scene);
-            }
-
-            // POLY REST API
         </script>
 	</body>
 </html>
