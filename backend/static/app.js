@@ -5,120 +5,143 @@
 const API_KEY = 'AIzaSyC3mTnJ6tywpTUAyBziSRnME63O5nSLOLg';
 
 
-function processCommand(json, container, objects) {
+function processCommand(json, container, objects3d, objs, mtls) {
     console.log(Object.keys(json));
     if (typeof json["commandName"] === 'undefined') {
         throw new Error("No command name found!");
     }
-    if (json["commandName"] != 'clear') {
+    if (json["commandName"] == 'clear') {
+        console.log('clear');
+        clear(container, objects3d, objs, mtls);
+    } else {
         if (typeof json["objectName"] === 'undefined') {
             throw new Error("No object name found!");
         }
-    }
+        var object = objects3d.get(json["onjectName"]);
 
-    switch(json["commandName"]) {
-        case 'create':
-            console.log('create');
-            create(json["objectName"], container, objects);
-            break;
-        case 'remove':
-            console.log('remove');
-            remove(json["objectName"], container, objects);
-            break;
-        case 'clear':
-            console.log('clear');
-            clear(container, objects);
-            break;
-        case 'rotate':
-            console.log('rotate');
-            rotate(json["objectName"], container, objects, json["angle"]);
-            break;
-        case 'move':
-            console.log('move');
-            if (typeof json["type"] === 'undefined') {
-                throw new Error("No move type found!");
-            }
-            switch (json["type"]) {
-                case 'up':
-                    up(json["objectName"], container, objects);
-                    break;
-                case 'down':
-                    down(json["objectName"], container, objects);
-                    break;
-                case 'left':
-                    left(json["objectName"], container, objects);
-                    break;
-                case 'right':
-                    right(json["objectName"], container, objects);
-                    break;
-                case 'front':
-                    front(json["objectName"], container, objects);
-                    break;
-                case 'back':
-                    back(json["objectName"], container, objects);
-                    break;
-            }
-            break;
-        case 'teleportate':
-            console.log('teleportate');
-            break;
-        case 'makeBigger':
-            console.log('makeBigger');
-            makeSmaller(json["objectName"], container, objects);
-            break;
-        case 'colour':
-            console.log('colour');
-            colour(json["objectName"], container, objects, json["r"], json["g"], json["b"]);
-        case 'makeSmaller':
-            console.log('makeSmaller');
-            makeBigger(json["objectName"], container, objects);
-            break;
-        default:
-            console.log("Unknown command");
-            break;
+        switch(json["commandName"]) {
+            case 'create':
+                console.log('create');
+                create(json["objectName"], container, objects3d, objs, mtls);
+            case 'remove':
+                console.log('remove');
+                remove(json["objectName"], container, objects3d, objs, mtls);
+                break;
+            case 'rotate':
+                console.log('rotate');
+                rotate(object, json["angle"]);
+                break;
+            case 'move':
+                console.log('move');
+                if (typeof json["type"] === 'undefined') {
+                    throw new Error("No move type found!");
+                }
+                switch (json["type"]) {
+                    case 'up':
+                        up(object);
+                        break;
+                    case 'down':
+                        down(object);
+                        break;
+                    case 'left':
+                        left(object);
+                        break;
+                    case 'right':
+                        right(object);
+                        break;
+                    case 'front':
+                        front(object);
+                        break;
+                    case 'back':
+                        back(object);
+                        break;
+                }
+                break;
+            case 'teleportate':
+                console.log('teleportate');
+                var subject = objects3d.get(json["subjectName"]);
+                teleportate(object, subject, json["edge"]);
+                break;
+            case 'makeBigger':
+                console.log('makeBigger');
+                makeBigger(object);
+                break;
+            case 'colour':
+                console.log('colour');
+                colour(object, json["r"], json["g"], json["b"]);
+            case 'makeSmaller':
+                console.log('makeSmaller');
+                makeSmaller(object);
+                break;
+            default:
+                console.log("Unknown command");
+                break;
+        }
     }
 }
 
+function teleportate(object, subject, edge) {
+	var subjectBbox = new THREE.Box3().setFromObject(subject);
+	var subjectCenter = subjectBbox.getCenter();
+	var subjectSize = subjectBbox.getSize();
 
-function rotate(objectName, container, objects, angle):
-    objects.get(objectName).rotateY(angle);
+	var objectBbox = new THREE.Box3().setFromObject(object);
+	var objectCenter = objectBbox.getCenter();
+	var objectSize = objectBbox.getSize();
 
-
-function colour(objectName, container, objects, r, g, b) {
-    objects.get(objectName).material.color.setRGB(r, g, b);
+    if (edge == "up") {
+        object.position.y = subjectCenter.y + subjectSize.y + objectSize.y;
+    } else (edge == "down") {
+        object.position.y = subjectCenter.y - subjectSize.y - objectSize.y;
+    } else if (edge == "right") {
+        object.position.x = subjectCenter.x + subjectSize.x + objectSize.x;
+    } else (edge == "left") {
+        object.position.x = subjectCenter.x - subjectSize.x - objectSize.x;
+    } else if (edge == "front") {
+        object.position.z = subjectCenter.z + subjectSize.z + objectSize.z;
+    } else (edge == "back") {
+        object.position.z = subjectCenter.z - subjectSize.z - objectSize.z;
+    }
 }
 
+function rotate(object, angle):
+    object.rotateY(angle);
+}
+
+function colour(object, r, g, b) {
+    object.material.color.setRGB(r, g, b);
+}
 
 const SCALE_MULT = 1.5;
 
-function makeBigger(objectName, container, objects) {
+function makeBigger(object) {
     var biggerMatrix = new THREE.Matrix4();
-    biggerMatrix.makeScale(1.0 / SCALE_MULT, 1.0 / SCALE_MULT, 1.0 / SCALE_MULT);
-    objects.get(objectName).applyMatrix(biggerMatrix);
+    biggerMatrix.makeScale(SCALE_MULT, SCALE_MULT, SCALE_MULT);
+    object.applyMatrix(biggerMatrix);
 }
 
 function makeSmaller(objectName, container, objects) {
     var smallerMatrix = new THREE.Matrix4();
-    smallerMatrix.makeScale(SCALE_MULT, SCALE_MULT, SCALE_MULT);
-    objects.get(objectName).applyMatrix(smallerMatrix);
+    smallerMatrix.makeScale(1.0 / SCALE_MULT, 1.0 / SCALE_MULT, 1.0 / SCALE_MULT);
+    object.applyMatrix(smallerMatrix);
 }
 
 const MOVE_STEP = 1;
 
-function up(objectName, container, objects) {
-    objects.get(objectName).translateY(MOVE_STEP);
+function up(object) {
+    object.translateY(MOVE_STEP);
 }
 
-function down(objectName, container, objects) {
-    objects.get(objectName).translateY(-MOVE_STEP);
+function down(object) {
+    object.translateY(-MOVE_STEP);
 }
 
-function left(objectName, container, objects) {
-    objects.get(objectName).translateX(-MOVE_STEP);
+function left(object) {
+    object.translateX(-MOVE_STEP);
 }
 
-function right(objectName, container, objects) {
-    objects.get(objectName).translateX(MOVE_STEP);
+function right(object) {
+    object.translateX(MOVE_STEP);
 }
 
 function front(objectName, container, objects) {
@@ -129,22 +152,25 @@ function back(objectName, container, objects) {
     objects.get(objectName).translateZ(-MOVE_STEP);
 }
 
-
-function clear(container, objects) {
+function clear(container, objects3d, objs, mtls) {
     while (container.children.length) {
         container.remove(container.children[0]);
     }
-    objects.clear();
+    objects3d.clear();
+    objs.clear();
+    mtls.clear();
 }
 
-function remove(objectName, container, objects) {
-    container.remove(objects.get(objectName));
-    objects.delete(objectName);
+function remove(objectName, container, objects3d, objs, mtls) {
+    container.remove(objects3d.get(objectName));
+    objects3d.delete(objectName);
+    objs.delete(objectName);
+    mtls.delete(objectName);
 }
 
-function create(objectName, container, objects) {
+function create(objectName, container, objects3d, objs, mtls) {
     function drawAsset(asset) {
-        drawAssetOnScene(asset, container, objects, objectName);
+        drawAssetOnScene(asset, container, objects3d, objs, mtls, objectName);
     }
     processFirstAsset(objectName, drawAsset);
 }
@@ -188,9 +214,9 @@ function processFirstAsset(objectName, processAsset) {
 }
 
 
-function drawAssetOnScene(asset, container, objects, objectName) {
+function drawAssetOnScene(asset, container, objects3d, objs, mtls, objectName) {
     var format = asset.formats.find(format => {return format.formatType === 'OBJ';});
-    if ( format !== undefined ) {
+    if (format !== undefined) {
         var obj = format.root;
         var mtl = format.resources.find(resource => {return resource.url.endsWith('mtl')});
 
@@ -217,7 +243,9 @@ function drawAssetOnScene(asset, container, objects, objectName) {
                 scaler.add(object);
                 scaler.scale.setScalar(6 / box.getSize().length());
                 container.add(scaler);
-                objects.set(objectName, scaler);
+                objects3d.set(objectName, scaler);
+                objs.set(objectName, scaler);
+                mtls.set(objectName, scaler);
             });
         });
     }
@@ -285,7 +313,7 @@ function startRecording() {
 }
 
 
-function stopRecordingWithScene(container, objects) {
+function stopRecordingWithScene(container, objects3d, objs, mtls) {
 	console.log("stopButton clicked");
 
 	//disable the stop button, enable the record too allow for new recordings
@@ -301,12 +329,12 @@ function stopRecordingWithScene(container, objects) {
 	//create the wav blob and pass it on to createDownloadLink
 
     function uploadWav(blob) {
-        uploadWavWithScene(blob, container, objects);
+        uploadWavWithScene(blob, container, objects3d, objs, mtls);
     }
 	rec.exportWAV(uploadWav);
 }
 
-function uploadWavWithScene(blob, container, objects) {
+function uploadWavWithScene(blob, container, objects3d, objs, mtls) {
     var xhr = new XMLHttpRequest();
     xhr.onload = function(e) {
         if (this.readyState === 4) {
@@ -322,7 +350,7 @@ function uploadWavWithScene(blob, container, objects) {
             console.log(commands);
             for (var i = 0; i < commands.length; ++i) {
                 console.log(i);
-                processCommand(commands[i], container, objects);
+                processCommand(commands[i], container, objects3d, objs, mtls);
             }
         }
     };

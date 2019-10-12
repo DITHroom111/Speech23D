@@ -69,7 +69,9 @@
 			var container = new THREE.Group();
 			scene.add(container);
 
-            let objects = new Map();
+            let objects3d = new Map();
+            let objs = new Map();
+            let mtls = new Map();
 
             function animate() {
                 var time = performance.now() / 5000;
@@ -92,7 +94,7 @@
             var rec;
 
             function stopRecording() {
-                stopRecordingWithScene(container, objects);
+                stopRecordingWithScene(container, objects3d, objs, mtls);
             }
 
             function downloadScene() {
