@@ -7,7 +7,7 @@ word_to_command = {'rotate': 'rotate', 'turn': 'rotate', 'spin': 'rotate', 'twis
                    'create': 'create', 'add': 'create', 'draw': 'create', 'print': 'create', 'put': 'create',
                    'move': 'move', 'fly': 'move', 'go': 'move', 'jump': 'move', 'change': 'move',
                    'teleportate': 'teleportate',
-                   'remove': 'remove', 'delete': 'delete',
+                   'remove': 'remove', 'delete': 'remove',
                    'bigger': 'make bigger', 'big': 'make bigger', 'larger': 'make bigger', 'large': 'make bigger',
                    'smaller': 'make smaller', 'small': 'make smaller', 'reduce': 'make smaller',
                    'clear': 'clear'}
@@ -217,8 +217,13 @@ def text_to_command(text, client):
                 print('Repeat direction')
 
     if command_type == 'remove':
-        assert len(entities) > 0, 'There is no anything to remove'
-        for object_name in entities:
+        objects_to_delete = []
+        if object_belonging == 'one':
+            assert len(entities) > 0, 'There is no anything to remove'
+            objects_to_delete = entities.copy()
+        if object_belonging == 'every':
+            objects_to_delete = get_memory_base(memory_base)
+        for object_name in objects_to_delete:
             object_in_memory_base = if_object_in_memory_base(memory_base, object_name)
             if object_in_memory_base:
                 remove_object_from_memory_base(memory_base, object_name)
