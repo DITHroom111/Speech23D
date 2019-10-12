@@ -44,9 +44,9 @@ button:first-child {
 #rawTextField {
     width:600px;
     height:100px;
-    background-color:#222222;
+    background-color: rgba(34, 34, 34, 0);
     color:#888888;
     position: absolute;
-    top: 10%; left: 1rem;
+    top: 12%; left: 1rem;
     font-size: 1.2rem;
 }
