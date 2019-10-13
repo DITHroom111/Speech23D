@@ -10,7 +10,6 @@
     <body>
         <div id="controls">
             <button id="recordButton">Click and say a command</button>
-            <button id="stopButton" disabled>Stop</button>
             <button id="downloadButton">Download 3D model</button>
         </div>
         <div id="rawTextField"></div>
@@ -78,15 +77,25 @@
             requestAnimationFrame(animate);
 
             var recordButton = document.getElementById("recordButton");
-            var stopButton = document.getElementById("stopButton");
             var downloadButton = document.getElementById("downloadButton");
             var uploadTextButton = document.getElementById("uploadTextButton");
             var rawTextField = document.getElementById("rawTextField");
             var gumStream;
             var rec;
 
-            function stopRecording() {
-                stopRecordingWithScene(container, objects3d);
+            var recordingInProcess = false;
+            recordButton.className = "nonPushedButton";
+
+            function recording() {
+                if (recordingInProcess) {
+                    stopRecordingWithScene(container, objects3d);
+                    recordButton.className = "nonPushedButton";
+                    recordingInProcess = false;
+                } else {
+                    recordButton.className = "pushedButton";
+                    recordingInProcess = true;
+                    startRecording();
+                }
             }
 
             function downloadScene() {
@@ -101,8 +110,7 @@
             }
 
             //add events to those 2 buttons
-            recordButton.addEventListener("click", startRecording);
-            stopButton.addEventListener("click", stopRecording);
+            recordButton.addEventListener("click", recording);
             downloadButton.addEventListener("click", downloadScene);
             uploadTextButton.addEventListener("click", uploadText);
         </script>
