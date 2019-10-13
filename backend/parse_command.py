@@ -17,9 +17,9 @@ word_to_command = {'rotate': 'rotate', 'turn': 'rotate', 'spin': 'rotate', 'twis
                    'clear': 'clear'}
 objects_belonging = {'everything': 'every'}
 
-correct_directions = ['left', 'right', 'up', 'down', 'back', 'top', 'front', 'on', 'under']
+correct_directions = ['left', 'right', 'up', 'down', 'back', 'top', 'front', 'forward', 'on', 'under']
 directions_to_draw = {'left': 'left', 'right': 'right', 'up': 'up', 'on': 'up', 'down': 'down', 'under': 'down',
-                      'back': 'back', 'top': 'front', 'front': 'front'}
+                      'back': 'back', 'top': 'front', 'front': 'front', 'forward': 'front'}
 
 correct_colours = ['green', 'red', 'white', 'yellow', 'blue', 'black', 'brown', 'pink']
 colour_to_rgb = {'green': (0.0, 1.0, 0.0), 'red': (1.0, 0.0, 0.0), 'white': (1.0, 1.0, 1.0),
