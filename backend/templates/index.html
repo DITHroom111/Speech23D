@@ -9,7 +9,7 @@
     </head>
     <body>
         <div id="controls">
-            <button id="recordButton">Click and say a command</button>
+            <button id="recordButton"></button>
             <button id="downloadButton">Download 3D model</button>
         </div>
         <div id="rawTextField"></div>
@@ -85,14 +85,17 @@
 
             var recordingInProcess = false;
             recordButton.className = "nonPushedButton";
+            recordButton.innerText = "Click and say a command";
 
             function recording() {
                 if (recordingInProcess) {
                     stopRecordingWithScene(container, objects3d);
                     recordButton.className = "nonPushedButton";
+                    recordButton.innerText = "Click and say a command";
                     recordingInProcess = false;
                 } else {
                     recordButton.className = "pushedButton";
+                    recordButton.innerText = "Stop recording...";
                     recordingInProcess = true;
                     startRecording();
                 }
