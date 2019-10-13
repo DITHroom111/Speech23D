@@ -201,6 +201,12 @@ function findAssetWithExactTitle(text, assets) {
     if (text == 'dinosaur') {
         text = 'stegoknight';
     }
+    if (text == 'man' || text == 'male' || text == 'person' || text == 'human' || text == 'men') {
+        text = 'male human avatar';
+    }
+    if (text == 'female' || text == 'woman') {
+        text = 'female human avatar';
+    }
 
     for (var i = 0; i < assets.length; ++i) {
         console.log(assets[i].displayName);
