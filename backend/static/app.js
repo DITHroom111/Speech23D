@@ -407,8 +407,12 @@ function downloadSceneWithScene(scene) {
     var zip = new JSZip();
     var oexporter = new THREE.OBJExporter();
     var result = oexporter.parse(scene);
-    zip.file('mymodel.obj', result.obj);
-    zip.file('objmaterial.mtl', result.mtl);
-    var zz=zip.generate({ type: 'blob' });
-    saveAs(zz, 'mymodel.zip');
+    console.log("result: " + result);
+    console.log("result.obj: " + result.mtl)
+
+   var blob = new Blob([result], {
+			type : 'text/plain'
+		});
+    saveAs(blob, 'model.obj');
+     
 }
