@@ -7,7 +7,7 @@ word_to_command = {'rotate': 'rotate', 'turn': 'rotate', 'spin': 'rotate', 'twis
                    'color': 'colour', 'colour': 'colour', 'green': 'colour', 'red': 'colour',
                    'white': 'colour', 'yellow': 'colour', 'blue': 'colour', 'black': 'colour',
                    'brown': 'colour', 'pink': 'colour',
-                   'on': 'create_and_teleportate', 'under': 'create_and_teleportate',
+                   'on': 'create_and_teleportate', 'under': 'create_and_teleportate', 'to': 'create_and_teleportate',
                    'teleportate': 'teleportate', 'put': 'teleportate',
                    'create': 'create', 'add': 'create', 'draw': 'create', 'print': 'create',
                    'move': 'move', 'fly': 'move', 'go': 'move', 'jump': 'move', 'change': 'move',
