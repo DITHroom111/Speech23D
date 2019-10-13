@@ -236,6 +236,9 @@ function drawObject(objects3d, obj, materials, objectName) {
         var scaler = new THREE.Group();
         scaler.add(object);
         scaler.scale.setScalar(6 / box.getSize().length());
+
+        console.log("Adding object to scene");
+
         container.add(scaler);
         objects3d.set(objectName, scaler);
     });
