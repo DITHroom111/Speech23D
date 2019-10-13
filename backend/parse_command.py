@@ -201,6 +201,9 @@ def text_to_command(text, client):
         text = remove_directions_from_text(text, direction)
     command_type = define_command_type(text)
     object_belonging = define_command_belonging(text)
+    if command_type == 'rotate' and len(text.split()) > 1:
+        if text.split()[-1] == 'degrees' or text.split()[-1] == 'degree':
+            text = ' '.join(text.split()[:-1])
     entities = get_entities(text, client)
     commands = []
 
@@ -226,6 +229,7 @@ def text_to_command(text, client):
             object_in_memory_base = if_object_in_memory_base(object_name)
             if object_in_memory_base:
                 if len(entities) > 1:
+                    print(entities[1])
                     if entities[1].split()[-1] == 'degrees' or entities[1].split()[-1] == 'degree':
                         entities[1] = ' '.join(entities[1].split()[:-1])
                     angle = float(text2int(entities[1])) * 3.14 / 180
