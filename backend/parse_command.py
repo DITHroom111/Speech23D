@@ -26,6 +26,9 @@ colour_to_rgb = {'green': (0.0, 1.0, 0.0), 'red': (1.0, 0.0, 0.0), 'white': (1.0
                  'yellow': (1.0, 1.0, 0.0), 'blue': (0.0, 0.0, 1.0), 'black': (0.0, 0.0, 0.0),
                  'brown': (0.4, 0.0, 0.0), 'pink': (1.0, 0.0, 1.0)}
 
+repeat_commands = ['repeat', 'more', 'again']
+previous_command = None
+
 memory_base = []
 
 
@@ -341,6 +344,7 @@ def text_to_command(text, client):
             else:
                 print('Repeat direction')
 
+    previous_command = commands
     return commands
 
 
@@ -380,6 +384,10 @@ def find_colour_in_text(text):
 def parse_command(text):
     client = language.LanguageServiceClient()
     text = text.lower()
+    for repeat_command in repeat_commands:
+        if repeat_command in text.split():
+            result_json = create_result_json(text, previous_command)
+            return result_json
     commands = text_to_command(text, client)
     result_json = create_result_json(text, commands)
     return result_json
