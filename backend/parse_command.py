@@ -9,7 +9,7 @@ word_to_command = {'rotate': 'rotate', 'turn': 'rotate', 'spin': 'rotate', 'twis
                    'white': 'colour', 'yellow': 'colour', 'blue': 'colour', 'black': 'colour',
                    'brown': 'colour', 'pink': 'colour',
                    'on': 'create_and_teleportate', 'under': 'create_and_teleportate', 'to': 'create_and_teleportate',
-                   'teleportate': 'teleportate', 'put': 'telepodrtate',
+                   'teleportate': 'teleportate', 'put': 'teleportate',
                    'create': 'create', 'add': 'create', 'draw': 'create', 'print': 'create',
                    'move': 'move', 'fly': 'move', 'go': 'move', 'jump': 'move', 'change': 'move',
                    'remove': 'remove', 'delete': 'remove',
@@ -217,6 +217,8 @@ def text_to_command(text, client, user_agent):
     if direction == 'on' and command_type == 'create':
         command_type = 'create_and_teleportate'
     entities = get_entities(text, client)
+    print(entities)
+    print(command_type)
     commands = []
 
     if command_type == 'create':
@@ -268,13 +270,16 @@ def text_to_command(text, client, user_agent):
                     print('Repeat direction')
 
     if command_type == 'teleportate':
+        print('we are here')
         object_name = entities[0]
         subject_name = entities[1]
         direction_is_correct = if_direction_is_correct(direction)
         object_in_memory_base = if_object_in_memory_base(object_name, user_agent)
         subject_in_memory_base = if_object_in_memory_base(subject_name, user_agent)
         if object_in_memory_base and subject_in_memory_base:
+            print('we are here 2')
             if direction_is_correct:
+                print('we are here 3')
                 current_command = get_command_for_teleportate(object_name, direction, subject_name)
                 commands.append(current_command)
             else:
@@ -346,11 +351,13 @@ def text_to_command(text, client, user_agent):
                     commands.append(current_command)
 
     if command_type == 'create_and_teleportate':
+        print('ww1')
         object_name = entities[0]
         subject_name = entities[1]
         direction_is_correct = if_direction_is_correct(direction)
         subject_in_memory_base = if_object_in_memory_base(subject_name, user_agent)
         if subject_in_memory_base:
+            print('ww2')
             if direction_is_correct:
                 current_command = get_command_for_create_and_teleportate(object_name, direction, subject_name)
                 commands.append(current_command)

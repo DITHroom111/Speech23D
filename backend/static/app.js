@@ -133,7 +133,7 @@ function colour(objectName, container, objects3d, r, g, b) {
     console.log(b);
     objects3d.get(objectName).traverse(function (child) {
         if (child instanceof THREE.Mesh) {
-            if (child.material.color === undefined) {
+            if (child.material.color !== undefined) {
                 child.material.color.setRGB(r, g, b);
             }
         }
@@ -213,6 +213,9 @@ function findAssetWithExactTitle(text, assets) {
     }
     if (text == 'female' || text == 'woman') {
         text = 'female human avatar';
+    }
+    if (text == 'plate') {
+        text = 'dish';
     }
 
     for (var i = 0; i < assets.length; ++i) {
