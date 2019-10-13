@@ -319,7 +319,7 @@ def text_to_command(text, client):
         if colour:
             print(colour)
             for object_name in objects_to_colour:
-                if len(object_name.split() > 1):
+                if len(object_name.split()) > 1:
                     object_name = object_name.split()[0]
                 print('first', object_name)
                 object_in_memory_base = if_object_in_memory_base(object_name)
