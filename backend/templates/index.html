@@ -70,7 +70,6 @@
 			scene.add(container);
 
             let objects3d = new Map();
-            let objs = new Map();
 
             function animate() {
                 var time = performance.now() / 5000;
@@ -93,7 +92,7 @@
             var rec;
 
             function stopRecording() {
-                stopRecordingWithScene(container, objects3d, objs);
+                stopRecordingWithScene(container, objects3d);
             }
 
             function downloadScene() {

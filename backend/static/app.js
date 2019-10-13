@@ -5,14 +5,14 @@
 const API_KEY = 'AIzaSyC3mTnJ6tywpTUAyBziSRnME63O5nSLOLg';
 
 
-function processCommand(json, container, objects3d, objs) {
+function processCommand(json, container, objects3d) {
     console.log(Object.keys(json));
     if (typeof json["commandName"] === 'undefined') {
         throw new Error("No command name found!");
     }
     if (json["commandName"] == 'clear') {
         console.log('clear');
-        clear(container, objects3d, objs);
+        clear(container, objects3d);
     } else {
         if (typeof json["objectName"] === 'undefined') {
             throw new Error("No object name found!");
@@ -22,10 +22,13 @@ function processCommand(json, container, objects3d, objs) {
         switch(json["commandName"]) {
             case 'create':
                 console.log('create');
-                create(json["objectName"], container, objects3d, objs);
+                create(json["objectName"], container, objects3d);
+            case 'createAndTeleportate':
+                console.log('createAndTeleportate');
+                createAndTeleportate(json["objectName"], container, objects3d, json["type"], json["subjectName"]);
             case 'remove':
                 console.log('remove');
-                remove(json["objectName"], container, objects3d, objs);
+                remove(json["objectName"], container, objects3d);
                 break;
             case 'rotate':
                 console.log('rotate');
@@ -68,7 +71,7 @@ function processCommand(json, container, objects3d, objs) {
                 break;
             case 'colour':
                 console.log('colour');
-                colour(json["objectName"], container, objects3d, objs, json["r"], json["g"], json["b"]);
+                colour(json["objectName"], container, objects3d, json["r"], json["g"], json["b"]);
                 break;
             case 'makeSmaller':
                 console.log('makeSmaller');
@@ -81,6 +84,17 @@ function processCommand(json, container, objects3d, objs) {
     }
 }
 
+function createAndTeleportate(objectName, container, objects3d, type, subject) {
+    if (objects3d.has(objectName)) {
+        teleportate(objects3d.get(objectName), subject, type);
+    } else {
+        function callback(object3d) {
+            teleportate(object3d, subject, type);
+        }
+        create(objectName, container, objects3d, callback);
+    }
+}
+
 function teleportate(object, subject, edge) {
 	var subjectBbox = new THREE.Box3().setFromObject(subject);
 	var subjectSize = subjectBbox.getSize();
@@ -89,6 +103,7 @@ function teleportate(object, subject, edge) {
     object.position.y = subject.position.y;
     object.position.z = subject.position.z;
 
+    
     if (edge == "up") {
         object.position.y += subjectSize.y;
     } else if (edge == "down") {
@@ -108,7 +123,7 @@ function rotate(object, angle) {
     object.rotateY(angle);
 }
 
-function colour(objectName, container, objects3d, objs, r, g, b) {
+function colour(objectName, container, objects3d, r, g, b) {
     objects3d.get(objectName).traverse(function (child) {
         if (child instanceof THREE.Mesh) {
             child.material.color.setRGB(r, g, b);
@@ -156,23 +171,21 @@ function back(object, container, objects) {
     object.translateZ(-MOVE_STEP);
 }
 
-function clear(container, objects3d, objs) {
+function clear(container, objects3d) {
     while (container.children.length) {
         container.remove(container.children[0]);
     }
     objects3d.clear();
-    objs.clear();
 }
 
-function remove(objectName, container, objects3d, objs) {
+function remove(objectName, container, objects3d) {
     container.remove(objects3d.get(objectName));
     objects3d.delete(objectName);
-    objs.delete(objectName);
 }
 
-function create(objectName, container, objects3d, objs) {
+function create(objectName, container, objects3d, objectCallback) {
     function drawAsset(asset) {
-        drawAssetOnScene(asset, container, objects3d, objs, objectName);
+        drawAssetOnScene(asset, container, objects3d, objectName, objectCallback);
     }
     processFirstAsset(objectName, drawAsset);
 }
@@ -223,7 +236,7 @@ function processFirstAsset(objectName, processAsset) {
     request.send(null);
 }
 
-function drawObject(objects3d, obj, materials, objectName) {
+function drawObject(objects3d, obj, materials, objectName, objectCallback) {
     var loader = new THREE.OBJLoader();
     loader.setMaterials(materials);
     loader.load(obj.url, function(object) {
@@ -240,14 +253,16 @@ function drawObject(objects3d, obj, materials, objectName) {
         scaler.add(object);
         scaler.scale.setScalar(6 / box.getSize().length());
 
-        console.log("Adding object to scene");
-
         container.add(scaler);
         objects3d.set(objectName, scaler);
+        if (objectCallback != null) {
+            objectCallback(scaler);
+        }
+        console.log("Adding object to scene");
     });
 }
 
-function drawObjectWithMtl(objects3d, obj, mtl, objectName) {
+function drawObjectWithMtl(objects3d, obj, mtl, objectName, objectCallback) {
     var path = obj.url.slice(0, obj.url.indexOf(obj.relativePath));
 
     var loader = new THREE.MTLLoader();
@@ -255,19 +270,18 @@ function drawObjectWithMtl(objects3d, obj, mtl, objectName) {
     loader.setMaterialOptions({ignoreZeroRGBs: true});
     loader.setTexturePath(path);
     loader.load(mtl.url, function(materials) {
-        drawObject(objects3d, obj, materials, objectName);
+        drawObject(objects3d, obj, materials, objectName, objectCallback);
     });
 }
 
 
-function drawAssetOnScene(asset, container, objects3d, objs, objectName) {
+function drawAssetOnScene(asset, container, objects3d, objectName, objectCallback) {
     var format = asset.formats.find(format => {return format.formatType === 'OBJ';});
     if (format !== undefined) {
         var obj = format.root;
         var mtl = format.resources.find(resource => {return resource.url.endsWith('mtl')});
 
-        objs.set(objectName, obj);
-        drawObjectWithMtl(objects3d, obj, mtl, objectName);
+        drawObjectWithMtl(objects3d, obj, mtl, objectName, objectCallback);
     }
 }
 
@@ -333,7 +347,7 @@ function startRecording() {
 }
 
 
-function stopRecordingWithScene(container, objects3d, objs) {
+function stopRecordingWithScene(container, objects3d) {
 	console.log("stopButton clicked");
 
 	//disable the stop button, enable the record too allow for new recordings
@@ -349,12 +363,12 @@ function stopRecordingWithScene(container, objects3d, objs) {
 	//create the wav blob and pass it on to createDownloadLink
 
     function uploadWav(blob) {
-        uploadWavWithScene(blob, container, objects3d, objs);
+        uploadWavWithScene(blob, container, objects3d);
     }
 	rec.exportWAV(uploadWav);
 }
 
-function uploadWavWithScene(blob, container, objects3d, objs) {
+function uploadWavWithScene(blob, container, objects3d) {
     var xhr = new XMLHttpRequest();
     xhr.onload = function(e) {
         if (this.readyState === 4) {
@@ -370,7 +384,7 @@ function uploadWavWithScene(blob, container, objects3d, objs) {
             console.log(commands);
             for (var i = 0; i < commands.length; ++i) {
                 console.log(i);
-                processCommand(commands[i], container, objects3d, objs);
+                processCommand(commands[i], container, objects3d);
             }
         }
     };
@@ -380,7 +394,7 @@ function uploadWavWithScene(blob, container, objects3d, objs) {
     xhr.send(fd);
 }
 
-function uploadTextWithScene(text, container, objects3d, objs) {
+function uploadTextWithScene(text, container, objects3d) {
     console.log("get form with text: " + text);
 
     var xhr = new XMLHttpRequest();
@@ -398,7 +412,7 @@ function uploadTextWithScene(text, container, objects3d, objs) {
             console.log(commands);
             for (var i = 0; i < commands.length; ++i) {
                 console.log(i);
-                processCommand(commands[i], container, objects3d, objs);
+                processCommand(commands[i], container, objects3d);
             }
         }
     };
