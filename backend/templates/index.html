@@ -71,7 +71,6 @@
 
             let objects3d = new Map();
             let objs = new Map();
-            let mtls = new Map();
 
             function animate() {
                 var time = performance.now() / 5000;
@@ -94,7 +93,7 @@
             var rec;
 
             function stopRecording() {
-                stopRecordingWithScene(container, objects3d, objs, mtls);
+                stopRecordingWithScene(container, objects3d, objs);
             }
 
             function downloadScene() {
@@ -105,7 +104,7 @@
                 var textForm = document.getElementById("inputModel").value;
 
                 console.log("send form to uploadText, text: " + textForm);
-                uploadTextWithScene(textForm, container, objects3d, objs, mtls);
+                uploadTextWithScene(textForm, container, objects3d, objs);
             }
 
             //add events to those 2 buttons
