@@ -204,6 +204,8 @@ def text_to_command(text, client):
     if command_type == 'rotate' and len(text.split()) > 1:
         if text.split()[-1] == 'degrees' or text.split()[-1] == 'degree':
             text = ' '.join(text.split()[:-1])
+    if 'side' in text.split():
+        text = remove_directions_from_text(text, 'side')
     entities = get_entities(text, client)
     commands = []
 
