@@ -307,8 +307,6 @@ function startRecording() {
     	Disable the record button until we get a success or fail from getUserMedia()
 	*/
 
-	recordButton.disabled = true;
-	stopButton.disabled = false;
     rawTextField.innerHTML = "tell me a command!";
 
 	/*
@@ -349,18 +347,12 @@ function startRecording() {
 
 	}).catch(function(err) {
 	  	//enable the record button if getUserMedia() fails
-    	recordButton.disabled = false;
-    	stopButton.disabled = true;
 	});
 }
 
 
 function stopRecordingWithScene(container, objects3d) {
 	console.log("stopButton clicked");
-
-	//disable the stop button, enable the record too allow for new recordings
-	stopButton.disabled = true;
-	recordButton.disabled = false;
 
 	//tell the recorder to stop the recording
 	rec.stop();
