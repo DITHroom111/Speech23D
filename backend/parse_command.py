@@ -1,4 +1,3 @@
-from collections import defaultdict
 # Imports the Google Cloud client library
 from google.cloud import language
 from google.cloud.language import enums
@@ -263,6 +262,14 @@ def text_to_command(text, client, user_agent):
         object_name = entities[0]
         subject_name = entities[1]
         direction_is_correct = if_direction_is_correct(direction)
+        object_in_memory_base = if_object_in_memory_base(object_name, user_agent)
+        subject_in_memory_base = if_object_in_memory_base(subject_name, user_agent)
+        if object_in_memory_base and subject_in_memory_base:
+            if direction_is_correct:
+                current_command = get_command_for_teleportate(object_name, direction, subject_name)
+                commands.append(current_command)
+            else:
+                print('Repeat direction')
         object_in_memory_base = if_object_in_memory_base(object_name, user_agent)
         subject_in_memory_base = if_object_in_memory_base(subject_name, user_agent)
         if not object_in_memory_base:
