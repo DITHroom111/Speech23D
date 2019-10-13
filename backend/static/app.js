@@ -69,6 +69,7 @@ function processCommand(json, container, objects3d, objs) {
             case 'colour':
                 console.log('colour');
                 colour(json["objectName"], container, objects3d, objs, json["r"], json["g"], json["b"]);
+                break;
             case 'makeSmaller':
                 console.log('makeSmaller');
                 makeSmaller(object);
@@ -113,23 +114,11 @@ function rotate(object, angle) {
 }
 
 function colour(objectName, container, objects3d, objs, r, g, b) {
-    object.traverse(function (child) {
+    objects3d.get(objectName).traverse(function (child) {
         if (child instanceof THREE.Mesh) {
-        child.material.color.setHex(0x00FF00);
+            child.material.color.setRGB(r, g, b);
         }
     });
-
-
-    //var obj = objs.get(objectName);
-    //remove(objectName, container, objects3d, objs);
-    //var color = new THREE.Color(r, g, b);
-
-    //var materials = new THREE.MeshBasicMaterial({
-        //color: color,
-    //});
-
-    //objs.set(objectName, obj);
-    //drawObject(objects3d, obj, materials, objectName);
 }
 
 const SCALE_MULT = 1.5;
