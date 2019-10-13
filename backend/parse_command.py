@@ -1,3 +1,4 @@
+from collections import defaultdict
 # Imports the Google Cloud client library
 from google.cloud import language
 from google.cloud.language import enums
@@ -29,7 +30,7 @@ colour_to_rgb = {'green': (0.0, 1.0, 0.0), 'red': (1.0, 0.0, 0.0), 'white': (1.0
 repeat_commands = ['repeat', 'more', 'again']
 previous_command = None
 
-memory_base = []
+memory_base = defaultdict(list)
 
 
 def text2int(textnum, numwords={}):
@@ -90,26 +91,26 @@ def if_direction_is_correct(direction):
     return False
 
 
-def if_object_in_memory_base(object_name):
-    if object_name in memory_base:
+def if_object_in_memory_base(object_name, user_agent):
+    if object_name in memory_base[user_agent]:
         return True
     return False
 
 
-def add_object_to_memory_base(object_name):
-    memory_base.append(object_name)
+def add_object_to_memory_base(object_name, user_agent):
+    memory_base[user_agent].append(object_name)
 
 
-def remove_object_from_memory_base(object_name):
-    memory_base.remove(object_name)
+def remove_object_from_memory_base(object_name, user_agent):
+    memory_base[user_agent].remove(object_name)
 
 
 def print_memory_base():
     print('Base consist of ' + ', '.join(memory_base))
 
 
-def get_memory_base():
-    return memory_base.copy()
+def get_memory_base(user_agent):
+    return memory_base[user_agent].copy()
 
 
 def clear_memory_base():
@@ -190,7 +191,7 @@ def remove_directions_from_text(text, direction):
     return ' '.join(new_text)
 
 
-def text_to_command(text, client):
+def text_to_command(text, client, user_agent):
     global previous_command
 
     if text == '':
@@ -213,10 +214,10 @@ def text_to_command(text, client):
     if command_type == 'create':
         assert len(entities) > 0, 'There is no anything to create'
         for object_name in entities:
-            object_in_memory_base = if_object_in_memory_base(object_name)
+            object_in_memory_base = if_object_in_memory_base(object_name, user_agent)
             if not object_in_memory_base:
                 print(memory_base)
-                add_object_to_memory_base(object_name)
+                add_object_to_memory_base(object_name, user_agent)
                 print(memory_base)
                 current_command = get_command_for_create(object_name)
                 commands.append(current_command)
@@ -227,9 +228,9 @@ def text_to_command(text, client):
             object_name = entities[0]
             objects_to_rotate.append(object_name)
         if object_belonging == 'every':
-            objects_to_rotate = get_memory_base()
+            objects_to_rotate = get_memory_base(user_agent)
         for object_name in objects_to_rotate:
-            object_in_memory_base = if_object_in_memory_base(object_name)
+            object_in_memory_base = if_object_in_memory_base(object_name, user_agent)
             if object_in_memory_base:
                 if len(entities) > 1:
                     print(entities[1])
@@ -247,10 +248,10 @@ def text_to_command(text, client):
             object_name = entities[0]
             objects_to_move.append(object_name)
         if object_belonging == 'every':
-            objects_to_move = get_memory_base()
+            objects_to_move = get_memory_base(user_agent)
         direction_is_correct = if_direction_is_correct(direction)
         for object_name in objects_to_move:
-            object_in_memory_base = if_object_in_memory_base(object_name)
+            object_in_memory_base = if_object_in_memory_base(object_name, user_agent)
             if object_in_memory_base:
                 if direction_is_correct:
                     current_command = get_command_for_move(object_name, direction)
@@ -262,14 +263,14 @@ def text_to_command(text, client):
         object_name = entities[0]
         subject_name = entities[1]
         direction_is_correct = if_direction_is_correct(direction)
-        object_in_memory_base = if_object_in_memory_base(object_name)
-        subject_in_memory_base = if_object_in_memory_base(subject_name)
+        object_in_memory_base = if_object_in_memory_base(object_name, user_agent)
+        subject_in_memory_base = if_object_in_memory_base(subject_name, user_agent)
         if not object_in_memory_base:
-            add_object_to_memory_base(object_name)
+            add_object_to_memory_base(object_name, user_agent)
             current_command = get_command_for_create(object_name)
             commands.append(current_command)
         if not subject_in_memory_base:
-            add_object_to_memory_base(subject_name)
+            add_object_to_memory_base(subject_name, user_agent)
             current_command = get_command_for_create(subject_name)
             commands.append(current_command)
         if direction_is_correct:
@@ -284,11 +285,11 @@ def text_to_command(text, client):
             assert len(entities) > 0, 'There is no anything to remove'
             objects_to_delete = entities.copy()
         if object_belonging == 'every':
-            objects_to_delete = get_memory_base()
+            objects_to_delete = get_memory_base(user_agent)
         for object_name in objects_to_delete:
-            object_in_memory_base = if_object_in_memory_base(object_name)
+            object_in_memory_base = if_object_in_memory_base(object_name, user_agent)
             if object_in_memory_base:
-                remove_object_from_memory_base(object_name)
+                remove_object_from_memory_base(object_name, user_agent)
                 current_command = get_command_for_remove(object_name)
                 commands.append(current_command)
 
@@ -297,9 +298,9 @@ def text_to_command(text, client):
         if object_belonging == 'one':
             objects_to_make_bigger = entities.copy()
         if object_belonging == 'every':
-            objects_to_make_bigger = get_memory_base()
+            objects_to_make_bigger = get_memory_base(user_agent)
         for object_name in objects_to_make_bigger:
-            object_in_memory_base = if_object_in_memory_base(object_name)
+            object_in_memory_base = if_object_in_memory_base(object_name, user_agent)
             if object_in_memory_base:
                 current_command = get_command_for_make_bigger(object_name)
                 commands.append(current_command)
@@ -309,9 +310,9 @@ def text_to_command(text, client):
         if object_belonging == 'one':
             objects_to_make_smaller = entities.copy()
         if object_belonging == 'every':
-            objects_to_make_smaller = get_memory_base()
+            objects_to_make_smaller = get_memory_base(user_agent)
         for object_name in objects_to_make_smaller:
-            object_in_memory_base = if_object_in_memory_base(object_name)
+            object_in_memory_base = if_object_in_memory_base(object_name, user_agent)
             if object_in_memory_base:
                 current_command = get_command_for_make_smaller(object_name)
                 commands.append(current_command)
@@ -328,7 +329,7 @@ def text_to_command(text, client):
         if object_belonging == 'one':
             objects_to_colour = entities.copy()
         if object_belonging == 'every':
-            objects_to_colour = get_memory_base()
+            objects_to_colour = get_memory_base(user_agent)
         colour = find_colour_in_text(text)
         if colour:
             print(colour)
@@ -336,7 +337,7 @@ def text_to_command(text, client):
                 if len(object_name.split()) > 1:
                     object_name = object_name.split()[0]
                 print('first', object_name)
-                object_in_memory_base = if_object_in_memory_base(object_name)
+                object_in_memory_base = if_object_in_memory_base(object_name, user_agent)
                 if object_in_memory_base:
                     print('second', object_name)
                     current_command = get_command_for_colour(object_name, colour)
@@ -347,7 +348,7 @@ def text_to_command(text, client):
         object_name = entities[0]
         subject_name = entities[1]
         direction_is_correct = if_direction_is_correct(direction)
-        subject_in_memory_base = if_object_in_memory_base(subject_name)
+        subject_in_memory_base = if_object_in_memory_base(subject_name, user_agent)
         if subject_in_memory_base:
             if direction_is_correct:
                 current_command = get_command_for_create_and_teleportate(object_name, direction, subject_name)
@@ -392,13 +393,13 @@ def find_colour_in_text(text):
     return None
 
 
-def parse_command(text):
+def parse_command(text, user_agent):
     client = language.LanguageServiceClient()
     text = text.lower()
     for repeat_command in repeat_commands:
         if repeat_command in text.split():
             result_json = create_result_json(text, previous_command)
             return result_json
-    commands = text_to_command(text, client)
+    commands = text_to_command(text, client, user_agent)
     result_json = create_result_json(text, commands)
     return result_json

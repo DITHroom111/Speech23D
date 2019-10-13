@@ -18,6 +18,7 @@ client = SpeechClient()
 @app.route('/upload', methods=['POST'])
 def upload():
     raw_audio = request.files['audio_data']
+    user_agent = request.headers.get('User-Agent')
     content = raw_audio.read()
     audio = types.RecognitionAudio(content=content)
     config = types.RecognitionConfig(
@@ -28,7 +29,7 @@ def upload():
     for result in response.results:
         voice_command = result.alternatives[0].transcript
         try:
-            parsed_command = parse_command(voice_command)
+            parsed_command = parse_command(voice_command, user_agent)
         except Exception as e:
             traceback.print_exc()
             return '"{}" command parsing failed'.format(voice_command)
@@ -44,16 +45,17 @@ def init_recorder():
 
 @app.route('/upload_text', methods=['POST'])
 def upload_text():
-   text_command = request.form.get("text")
-   print(request.form)
-   try:
-       parsed_command = parse_command(text_command)
-   except Exception as e:
-       traceback.print_exc()
-       return '"{}" command parsing failed'.format(text_command)
-   print(parsed_command)
-   return json.dumps(parsed_command)  
-    
+    text_command = request.form.get("text")
+    user_agent = request.headers.get('User-Agent')
+    print(request.form)
+    try:
+        parsed_command = parse_command(text_command, user_agent)
+    except Exception as e:
+        traceback.print_exc()
+        return '"{}" command parsing failed'.format(text_command)
+    print(parsed_command)
+    return json.dumps(parsed_command)
+
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True, port=5000)
+    app.run(host='0.0.0.0', debug=True, port=5000, ssl_context=('cert.pem', 'key.pem'))
