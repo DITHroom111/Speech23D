@@ -56,8 +56,8 @@ button:first-child {
 }
 #inputModel {
     position: relative;
-    width:70%;
-    height:40px;
+    width:50%;
+    height:32px;
     font-size: 1.1rem;
 }
 html, body {
