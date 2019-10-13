@@ -83,12 +83,7 @@ function processCommand(json, container, objects3d, objs) {
 
 function teleportate(object, subject, edge) {
 	var subjectBbox = new THREE.Box3().setFromObject(subject);
-	var subjectCenter = subjectBbox.getCenter();
 	var subjectSize = subjectBbox.getSize();
-
-	var objectBbox = new THREE.Box3().setFromObject(object);
-	var objectCenter = objectBbox.getCenter();
-	var objectSize = objectBbox.getSize();
 
     object.position.x = subject.position.x;
     object.position.y = subject.position.y;
@@ -184,6 +179,14 @@ function create(objectName, container, objects3d, objs) {
 
 function findAssetWithExactTitle(text, assets) {
     console.log(text);
+
+    if (text == 'table') {
+        text = 'desk';
+    }
+    if (text == 'dinosaur') {
+        text = 'stegoknight';
+    }
+
     for (var i = 0; i < assets.length; ++i) {
         console.log(assets[i].displayName);
         if (assets[i].displayName.toLowerCase() == text) {
@@ -417,5 +420,5 @@ function downloadSceneWithScene(scene) {
 			type : 'text/plain'
 		});
     saveAs(blob, 'model.obj');
-     
+
 }
