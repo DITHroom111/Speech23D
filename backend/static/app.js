@@ -17,7 +17,7 @@ function processCommand(json, container, objects3d, objs, mtls) {
         if (typeof json["objectName"] === 'undefined') {
             throw new Error("No object name found!");
         }
-        var object = objects3d.get(json["onjectName"]);
+        var object = objects3d.get(json["objectName"]);
 
         switch(json["commandName"]) {
             case 'create':
@@ -89,27 +89,27 @@ function teleportate(object, subject, edge) {
 	var objectCenter = objectBbox.getCenter();
 	var objectSize = objectBbox.getSize();
 
+    object.position.x = subject.position.x;
+    object.position.y = subject.position.y;
+    object.position.z = subject.position.z;
+
     if (edge == "up") {
-        object.position.y = subjectCenter.y + subjectSize.y + objectSize.y;
-    } else (edge == "down") {
-        object.position.y = subjectCenter.y - subjectSize.y - objectSize.y;
+        object.position.y += subjectSize.y;
+    } else if (edge == "down") {
+        object.position.y -= subjectSize.y;
     } else if (edge == "right") {
-        object.position.x = subjectCenter.x + subjectSize.x + objectSize.x;
-    } else (edge == "left") {
-        object.position.x = subjectCenter.x - subjectSize.x - objectSize.x;
+        object.position.x += subjectSize.x;
+    } else if (edge == "left") {
+        object.position.x -= subjectSize.x;
     } else if (edge == "front") {
-        object.position.z = subjectCenter.z + subjectSize.z + objectSize.z;
-    } else (edge == "back") {
-        object.position.z = subjectCenter.z - subjectSize.z - objectSize.z;
+        object.position.z += subjectSize.z;
+    } else if (edge == "back") {
+        object.position.z -= subjectSize.z;
     }
 }
 
-function rotate(objectName, container, objects, angle) {
-    objects.get(objectName).rotateY(angle);
-}
-
-function colour(objectName, container, objects, r, g, b) {
-    objects.get(objectName).material.color.setRGB(r, g, b);
+function rotate(object, angle) {
+    object.rotateY(angle);
 }
 
 function colour(object, r, g, b) {
@@ -124,7 +124,7 @@ function makeBigger(object) {
     object.applyMatrix(biggerMatrix);
 }
 
-function makeSmaller(objectName, container, objects) {
+function makeSmaller(object) {
     var smallerMatrix = new THREE.Matrix4();
     smallerMatrix.makeScale(1.0 / SCALE_MULT, 1.0 / SCALE_MULT, 1.0 / SCALE_MULT);
     object.applyMatrix(smallerMatrix);
@@ -148,12 +148,12 @@ function right(object) {
     object.translateX(MOVE_STEP);
 }
 
-function front(objectName, container, objects) {
-    objects.get(objectName).translateZ(MOVE_STEP);
+function front(object, container, objects) {
+    object.translateZ(MOVE_STEP);
 }
 
-function back(objectName, container, objects) {
-    objects.get(objectName).translateZ(-MOVE_STEP);
+function back(object, container, objects) {
+    object.translateZ(-MOVE_STEP);
 }
 
 function clear(container, objects3d, objs, mtls) {
@@ -364,7 +364,7 @@ function uploadWavWithScene(blob, container, objects3d, objs, mtls) {
     xhr.send(fd);
 }
 
-function uploadTextWithScene(text, container, objects) {
+function uploadTextWithScene(text, container, objects3d, objs, mtls) {
     console.log("get form with text: " + text);
 
     var xhr = new XMLHttpRequest();
@@ -382,7 +382,7 @@ function uploadTextWithScene(text, container, objects) {
             console.log(commands);
             for (var i = 0; i < commands.length; ++i) {
                 console.log(i);
-                processCommand(commands[i], container, objects);
+                processCommand(commands[i], container, objects3d, objs, mtls);
             }
         }
     };
