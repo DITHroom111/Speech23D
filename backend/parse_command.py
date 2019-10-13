@@ -206,6 +206,7 @@ def text_to_command(text, client):
             text = ' '.join(text.split()[:-1])
     if 'side' in text.split():
         text = remove_directions_from_text(text, 'side')
+        command_type = 'teleportate'
     entities = get_entities(text, client)
     commands = []
 
