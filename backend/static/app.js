@@ -351,7 +351,7 @@ function startRecording() {
 			Create the Recorder object and configure to record mono sound (1 channel)
 			Recording 2 channels  will double the file size
 		*/
-		rec = new Recorder(input, {numChannels: 1})
+		rec = new Recorder(input, {numChannels: 2})
 
 		//start the recording process
 		rec.record()

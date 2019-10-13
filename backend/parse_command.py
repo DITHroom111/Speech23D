@@ -34,43 +34,46 @@ colour_to_rgb = {'green': (0.0, 1.0, 0.0), 'red': (1.0, 0.0, 0.0), 'white': (1.0
                  'brown': (0.4, 0.0, 0.0), 'pink': (1.0, 0.0, 1.0)}
 
 repeat_commands = ['repeat', 'more', 'again']
-previous_command = None
+previous_command = {}
 
 memory_base = defaultdict(list)
 
 
 def text2int(textnum, numwords={}):
-    if not numwords:
-        units = [
-            "zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
-            "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen",
-            "sixteen", "seventeen", "eighteen", "nineteen",
-        ]
+    try:
+        return float(textnum)
+    except Exception as e:
+        if not numwords:
+            units = [
+                "zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
+                "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen",
+                "sixteen", "seventeen", "eighteen", "nineteen",
+            ]
 
-        tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"]
+            tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"]
 
-        scales = ["hundred", "thousand", "million", "billion", "trillion"]
+            scales = ["hundred", "thousand", "million", "billion", "trillion"]
 
-        numwords["and"] = (1, 0)
-        for idx, word in enumerate(units):
-            numwords[word] = (1, idx)
-        for idx, word in enumerate(tens):
-            numwords[word] = (1, idx * 10)
-        for idx, word in enumerate(scales):
-            numwords[word] = (10 ** (idx * 3 or 2), 0)
+            numwords["and"] = (1, 0)
+            for idx, word in enumerate(units):
+                numwords[word] = (1, idx)
+            for idx, word in enumerate(tens):
+                numwords[word] = (1, idx * 10)
+            for idx, word in enumerate(scales):
+                numwords[word] = (10 ** (idx * 3 or 2), 0)
 
-    current = result = 0
-    for word in textnum.split():
-        if word not in numwords:
-            raise Exception("Illegal word: " + word)
+        current = result = 0
+        for word in textnum.split():
+            if word not in numwords:
+                raise Exception("Illegal word: " + word)
 
-        scale, increment = numwords[word]
-        current = current * scale + increment
-        if scale > 100:
-            result += current
-            current = 0
+            scale, increment = numwords[word]
+            current = current * scale + increment
+            if scale > 100:
+                result += current
+                current = 0
 
-    return result + current
+        return result + current
 
 
 def create_result_json(text, commands):
@@ -364,7 +367,7 @@ def text_to_command(text, client, user_agent):
             else:
                 print('Repeat direction')
 
-    previous_command = commands
+    previous_command[user_agent] = commands
     return commands
 
 
@@ -407,7 +410,7 @@ def parse_command(text, user_agent):
     text = text.lower()
     for repeat_command in repeat_commands:
         if repeat_command in text.split():
-            result_json = create_result_json(text, previous_command)
+            result_json = create_result_json(text, previous_command.get(user_agent))
             return result_json
     commands = text_to_command(text, client, user_agent)
     result_json = create_result_json(text, commands)
