@@ -23,9 +23,11 @@ function processCommand(json, container, objects3d) {
             case 'create':
                 console.log('create');
                 create(json["objectName"], container, objects3d);
+                break;
             case 'createAndTeleportate':
                 console.log('createAndTeleportate');
                 createAndTeleportate(json["objectName"], container, objects3d, json["type"], json["subjectName"]);
+                break;
             case 'remove':
                 console.log('remove');
                 remove(json["objectName"], container, objects3d);
@@ -103,7 +105,7 @@ function teleportate(object, subject, edge) {
     object.position.y = subject.position.y;
     object.position.z = subject.position.z;
 
-    
+
     if (edge == "up") {
         object.position.y += subjectSize.y;
     } else if (edge == "down") {

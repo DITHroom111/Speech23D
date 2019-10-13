@@ -21,13 +21,8 @@
 
 		<div id="viewer"></div>
 
-            <input type="text" id="inputModel" name="text"></input>
-            <button id="uploadTextButton">Upload Text</button>
-        </form>
-		<div id="info">
-			<span id="asset_name">Title</span><br/>
-			by <span id="asset_author">Author</span>
-		</div>
+        <input type="text" id="inputModel" name="text"></input>
+        <button id="uploadTextButton">Upload Text</button>
 		<script src="static/third_party/three.js/js/three.min.js"></script>
 		<script src="static/third_party/three.js/js/OBJLoader.js"></script>
 		<script src="static/third_party/three.js/js/MTLLoader.js"></script>
@@ -103,7 +98,7 @@
                 var textForm = document.getElementById("inputModel").value;
 
                 console.log("send form to uploadText, text: " + textForm);
-                uploadTextWithScene(textForm, container, objects3d, objs);
+                uploadTextWithScene(textForm, container, objects3d);
             }
 
             //add events to those 2 buttons
