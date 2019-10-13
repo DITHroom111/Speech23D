@@ -191,6 +191,8 @@ def remove_directions_from_text(text, direction):
 
 
 def text_to_command(text, client):
+    global previous_command
+
     if text == '':
         commands = []
         return commands
