@@ -9,13 +9,19 @@ word_to_command = {'rotate': 'rotate', 'turn': 'rotate', 'spin': 'rotate', 'twis
                    'white': 'colour', 'yellow': 'colour', 'blue': 'colour', 'black': 'colour',
                    'brown': 'colour', 'pink': 'colour',
                    'on': 'create_and_teleportate', 'under': 'create_and_teleportate', 'to': 'create_and_teleportate',
-                   'teleportate': 'teleportate', 'put': 'teleportate',
+                   'teleportate': 'teleportate', 'put': 'telepodrtate',
                    'create': 'create', 'add': 'create', 'draw': 'create', 'print': 'create',
                    'move': 'move', 'fly': 'move', 'go': 'move', 'jump': 'move', 'change': 'move',
                    'remove': 'remove', 'delete': 'remove',
                    'bigger': 'make bigger', 'big': 'make bigger', 'larger': 'make bigger', 'large': 'make bigger',
                    'smaller': 'make smaller', 'small': 'make smaller', 'reduce': 'make smaller',
                    'clear': 'clear'}
+sorted_words = ['rotate', 'turn', 'spin', 'twist', 'color', 'colour', 'green', 'red',
+                'white', 'yellow', 'blue', 'black', 'brown', 'pink', 'on', 'under', 'to',
+                'teleportate', 'put', 'create', 'add', 'draw', 'print', 'move', 'fly', 'go',
+                'jump', 'change', 'remove', 'delete', 'bigger', 'big', 'larger', 'large',
+                'smaller', 'small', 'reduce', 'clear']
+
 objects_belonging = {'everything': 'every'}
 
 correct_directions = ['left', 'right', 'up', 'down', 'back', 'top', 'front', 'forward', 'on', 'under']
@@ -208,6 +214,8 @@ def text_to_command(text, client, user_agent):
     if 'side' in text.split():
         text = remove_directions_from_text(text, 'side')
         command_type = 'teleportate'
+    if direction == 'on' and command_type == 'create':
+        command_type = 'create_and_teleportate'
     entities = get_entities(text, client)
     commands = []
 
@@ -355,9 +363,10 @@ def text_to_command(text, client, user_agent):
 
 def define_command_type(text):
     default_command_type = 'create'
-    for word in word_to_command.keys():
+    for word in sorted_words:
         if word in text.split():
             command_type = word_to_command[word]
+            print('first found', word)
             return command_type
     return default_command_type
 

@@ -86,11 +86,13 @@ function processCommand(json, container, objects3d) {
     }
 }
 
-function createAndTeleportate(objectName, container, objects3d, type, subject) {
+function createAndTeleportate(objectName, container, objects3d, type, subjectName) {
+    var subject = objects3d.get(subjectName);
     if (objects3d.has(objectName)) {
         teleportate(objects3d.get(objectName), subject, type);
     } else {
         function callback(object3d) {
+            console.log('in callback');
             teleportate(object3d, subject, type);
         }
         create(objectName, container, objects3d, callback);
@@ -98,13 +100,13 @@ function createAndTeleportate(objectName, container, objects3d, type, subject) {
 }
 
 function teleportate(object, subject, edge) {
+console.log(Object.keys(subject));
 	var subjectBbox = new THREE.Box3().setFromObject(subject);
 	var subjectSize = subjectBbox.getSize();
 
     object.position.x = subject.position.x;
     object.position.y = subject.position.y;
     object.position.z = subject.position.z;
-
 
     if (edge == "up") {
         object.position.y += subjectSize.y;
@@ -126,9 +128,14 @@ function rotate(object, angle) {
 }
 
 function colour(objectName, container, objects3d, r, g, b) {
+    console.log(r);
+    console.log(g);
+    console.log(b);
     objects3d.get(objectName).traverse(function (child) {
         if (child instanceof THREE.Mesh) {
-            child.material.color.setRGB(r, g, b);
+            if (child.material.color === undefined) {
+                child.material.color.setRGB(r, g, b);
+            }
         }
     });
 }
@@ -263,9 +270,12 @@ function drawObject(objects3d, obj, materials, objectName, objectCallback) {
 
         container.add(scaler);
         objects3d.set(objectName, scaler);
+
         if (objectCallback != null) {
+            console.log('before callback');
             objectCallback(scaler);
         }
+
         console.log("Adding object to scene");
     });
 }
