@@ -39,7 +39,3 @@ These are the available samples:
 
 For license information, refer to the `LICENSE` file.
 
-## Additional Info
-HAHAHA DISREGARD THAT WE SUCK COCKS
-
-With love, S.W.
